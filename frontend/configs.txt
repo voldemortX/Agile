@@ -1,0 +1,5 @@
+versions:
+npm 6.4.1
+nodejs 10.15.3
+vue 2.6
+vue-cli 3.6.3

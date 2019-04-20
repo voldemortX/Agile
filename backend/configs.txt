@@ -1,0 +1,8 @@
+versions:
+python 3.6+
+
+python requirements:
+flask
+flask-sqlalchemy
+unittest
+json
