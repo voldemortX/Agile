@@ -6,3 +6,4 @@ flask
 flask-sqlalchemy
 unittest
 json
+concurrent_log_handler
