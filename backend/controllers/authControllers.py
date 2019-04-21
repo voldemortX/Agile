@@ -12,9 +12,9 @@ blueprint_auth = Blueprint('auth', __name__, url_prefix='/auth')
 def auth_register_controller():
     # Get post parameters
     try:
-        tempData = request.json
-        username = tempData['username']
-        password = tempData['password']
+        temp_data = request.json
+        username = temp_data['username']
+        password = temp_data['password']
     except:  # Parameter error
         current_app.logger.error("Error in parsing requests:", exc_info=True)
         return jsonify({'status': 1, 'error': HTTP_BADREQ_TEXT}), HTTP_BADREQ
@@ -35,6 +35,8 @@ def auth_register_controller():
         current_app.logger.error("Error in inserting a new user:", exc_info=True)
         current_app.db.session.rollback()
         return jsonify({'status': 1, 'error': '数据库未知错误'}), HTTP_UNKNOWN
+
+    return jsonify({'status': 0}), HTTP_OK
 
 
 @blueprint_auth.route('/login', methods=['POST'])
