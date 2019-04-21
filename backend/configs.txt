@@ -4,6 +4,6 @@ python 3.6+
 python requirements:
 flask
 flask-sqlalchemy
-unittest
+pytest
 json
 concurrent_log_handler
