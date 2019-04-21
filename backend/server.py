@@ -3,14 +3,17 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from params import appConfig
 from myLog import init_logger, log_path
-from controllers.auth import blueprint_auth
+from controllers.authControllers import blueprint_auth
+from controllers.sysControllers import blueprint_sys
 
 app = Flask(__name__)
 app.config.from_mapping(appConfig)
 app.db = SQLAlchemy(app)
 app.register_blueprint(blueprint_auth)
+app.register_blueprint(blueprint_sys)
 
 
+# Database session management suggested by zyf
 @app.teardown_request
 def checkin_db(exc):
     try:
