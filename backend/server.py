@@ -3,12 +3,12 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from params import appConfig
 from myLog import init_logger, log_path
-from controllers.auth import blueprintAuth
+from controllers.auth import blueprint_auth
 
 app = Flask(__name__)
 app.config.from_mapping(appConfig)
 app.db = SQLAlchemy(app)
-app.register_blueprint(blueprintAuth)
+app.register_blueprint(blueprint_auth)
 
 
 @app.teardown_request
