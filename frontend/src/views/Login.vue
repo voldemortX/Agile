@@ -18,7 +18,7 @@
         </ul>
         <ul>
             <li>
-                <el-button @click=registerClick>注册此帐号</el-button>
+                <el-button @click=registerClick>注册</el-button>
             </li>
         </ul>
 
