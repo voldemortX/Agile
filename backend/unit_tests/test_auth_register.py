@@ -20,8 +20,9 @@ class TestModels(object):
 
     # Test for bad requests
     def test_400(self):
-        res = self.client.post('/auth/register', json={'username': 'test'})
-        assert res.status_code == HTTP_BADREQ
+         res = self.client.post('/auth/register', json={'username': 'test'})
+         assert res.status_code == HTTP_BADREQ
+
 
     # Test for successful register is a sub-test of
     # the test for duplicate users
