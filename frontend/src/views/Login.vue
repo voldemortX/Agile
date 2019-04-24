@@ -1,31 +1,23 @@
 <template>
-    <div>
+    <div class="top-align">
+        <h1>风险评估系统</h1>
         <el-row>
             <el-col :span="10"><div class="grid-content"></div></el-col>
             <el-col :span="4">
-                <div class="bg-purple-dark">
-                    <el-row>
-                        <div>
-                            <el-input size="medium" v-model="username" placeholder="Enter your name..."></el-input>
-                        </div>
-                    </el-row>
-                    <el-row>
-                        <div>
-                            <el-input size="medium" v-model="password" type="password" placeholder="Enter your password..."></el-input>
-                        </div>
-                    </el-row>
-                    <el-row>
-                        <el-col :span="12">
-                            <div>
-                                <el-button @click=loginClick>登录</el-button>
-                            </div>
-                        </el-col>
-                        <el-col :span="12">
-                            <div>
-                                <el-button @click=registerClick>注册</el-button>
-                            </div>
-                        </el-col>
-                    </el-row>
+                <div class="bg-light">
+                    <el-row><div class="grid-content bg-dark"></div></el-row>
+                    <el-form :label-position="labelPosition">
+                        <el-form-item>
+                            <el-input prefix-icon="el-icon-arrow-right" size="medium" v-model="username" placeholder="用户名"></el-input>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-input prefix-icon="el-icon-arrow-right" size="medium" v-model="password" type="password" placeholder="密码"></el-input>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button @click=login_click>登录</el-button>
+                            <el-button @click=register_click>注册</el-button>
+                        </el-form-item>
+                    </el-form>
                 </div>
             </el-col>
             <el-col :span="10"><div class="grid-content"></div></el-col>
@@ -39,6 +31,7 @@
         name: "Login",
         data(){
             return{
+                labelPosition: "right",
                 username: "",
                 password: ""
 
@@ -55,24 +48,23 @@
         border-radius: 4px;
     }
     .el-input {
-        margin: 20px;
-        width: 240px;
+        width: 200px;
     }
     .el-button {
         margin: 20px;
     }
-    .bg-purple-dark {
-        background: #99a9bf;
+    .bg-dark {
+        background: #1976d2;
     }
-    .bg-purple {
-        background: #d3dce6;
-    }
-    .bg-purple-light {
-        background: #e5e9f2;
+    .bg-light {
+        background: #2196F3;
     }
     .grid-content {
         border-radius: 4px;
         min-height: 36px;
+    }
+    .top-align {
+        margin-top: 10%;
     }
 
 </style>
