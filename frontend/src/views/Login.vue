@@ -14,8 +14,8 @@
                             <el-input prefix-icon="el-icon-arrow-right" size="medium" v-model="password" type="password" placeholder="密码"></el-input>
                         </el-form-item>
                         <el-form-item>
-                            <el-button @click=login_click>登录</el-button>
-                            <el-button @click=register_click>注册</el-button>
+                            <el-button type="success" round @click=login_click>登录</el-button>
+                            <el-button round plain @click=register_click>注册</el-button>
                         </el-form-item>
                     </el-form>
                 </div>
