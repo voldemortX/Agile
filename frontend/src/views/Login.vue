@@ -36,8 +36,47 @@
                 password: ""
 
             }
+        },
+
+        methods:{
+            dump: function() {
+                // self-explaintary
+                this.username = "";
+                this.password = "";
+            },
+            login_click: function() {
+                // post name: str; pwd: str; memo: str(true or false)
+                // 0->success; 1->doesn't match; 2->cookie doesn't exist or expired
+                this.$http({
+                    method: 'POST',
+                    //method: 'GET',
+                    url: 'localhost:7777/auth/login',
+                    //url: '../../static/login.json',
+                    data: {
+                        name: this.username,
+                        pwd: this.password
+                    }
+                }).then(
+                    (response) => {
+                        // success
+                        if (response.body.status === 0) {
+                            this.$router.push({path: '/mainPage'});
+                        } else {
+                            alert(response.body.error);
+                        }
+                    },
+                    (error) => {
+                        // error
+                        //console.log(error);
+                        alert(error);
+                    }
+                );
+
+            }
         }
     }
+
+
 </script>
 
 <style scoped>
