@@ -1,3 +1,5 @@
+#!/usr/bin/env python 
+# -*- coding:utf-8 -*-
 from models import User
 from server import app
 from params import HTTP_OK, HTTP_UNKNOWN, HTTP_BADREQ, HTTP_UNAUTH
@@ -16,28 +18,28 @@ class TestModels(object):
         self.app.db.session.commit()
         # Close connections
         self.app.db.session.remove()
-        print('\n/auth/register ut complete!')
-
-    # Test for bad requests
-    def test_400(self):
-         res = self.client.post('/auth/register', json={'username': 'test'})
-         assert res.status_code == HTTP_BADREQ
+        print('\n/auth/login ut complete!')
 
 
-    # Test for successful register is a sub-test of
-    # the test for duplicate users
     def test_exist(self):
-        # Valid
-        res = self.client.post('/auth/register', json={'username': '__test__user', 'password': '123456'})
-        assert res.status_code == HTTP_OK
-        assert res.is_json is True
-        data = res.get_json()
-        assert data['status'] == 0
-
         # Invalid
-        res = self.client.post('/auth/register', json={'username': '__test__user', 'password': '654321'})
+        res = self.client.post('/auth/login', json={'username': '__test__user', 'password': '654321'})
         assert res.status_code == HTTP_OK
         assert res.is_json is True
         data = res.get_json()
         assert data['status'] == 1
-        assert data['error'] == '用户名已被注册'
+        assert data['error'] == '用户名不存在！'
+
+        res = self.client.post('/auth/login', json={'username': '__test__user1', 'password': '12345'})
+        assert res.status_code == HTTP_OK
+        assert res.is_json is True
+        data = res.get_json()
+        assert data['status'] == 1
+        assert data['error'] == '用户名或密码输入错误'
+
+        # Valid
+        res = self.client.post('/auth/login', json={'username': '__test__user1', 'password': '123'})
+        assert res.status_code == HTTP_OK
+        assert res.is_json is True
+        data = res.get_json()
+        assert data['status'] == 0
