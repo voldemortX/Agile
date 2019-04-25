@@ -49,12 +49,10 @@
                 // 0->success; 1->doesn't match; 2->cookie doesn't exist or expired
                 this.$http({
                     method: 'POST',
-                    //method: 'GET',
-                    url: 'localhost:7777/auth/login',
-                    //url: '../../static/login.json',
-                    data: {
-                        name: this.username,
-                        pwd: this.password
+                    url: 'http://134.175.225.180:3000/mock/43/auth/login',
+                    params: {
+                        username: this.username,
+                        password: this.password
                     }
                 }).then(
                     (response) => {
@@ -67,7 +65,7 @@
                     },
                     (error) => {
                         // error
-                        //console.log(error);
+                        this.dump();
                         alert(error);
                     }
                 );
