@@ -57,6 +57,7 @@ def auth_login_controller():
     if user:
         #Check the password
         if user.username==username and user.password==pwd:
+            session['username'] = username
             return jsonify({'status': 0}), HTTP_OK
         else:
             return jsonify({'status': 1, 'error': '用户名或密码输入错误'}), HTTP_OK
