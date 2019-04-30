@@ -6,10 +6,11 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "test:unit": "vue-cli-service test:unit"
+    "test:unit": "vue-cli-service test:unit --timeout 5000"
   },
   "dependencies": {
     "core-js": "^2.6.5",
+    "electron": "^5.0.0",
     "element-ui": "^2.4.5",
     "vue": "^2.6.10",
     "vue-resource": "^1.5.1",

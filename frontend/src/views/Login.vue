@@ -8,14 +8,15 @@
                     <el-row><div class="grid-content bg-dark"></div></el-row>
                     <el-form :label-position="labelPosition">
                         <el-form-item>
-                            <el-input prefix-icon="el-icon-arrow-right" size="medium" v-model="username" placeholder="用户名"></el-input>
+                            <el-input name="username" prefix-icon="el-icon-arrow-right" size="medium" v-model="username" placeholder="用户名"></el-input>
                         </el-form-item>
                         <el-form-item>
-                            <el-input prefix-icon="el-icon-arrow-right" size="medium" v-model="password" type="password" placeholder="密码"></el-input>
+                            <el-input name="password" prefix-icon="el-icon-arrow-right" size="medium" v-model="password" type="password" placeholder="密码"></el-input>
                         </el-form-item>
                         <el-form-item>
-                            <el-button type="success" round @click=login_click>登录</el-button>
-                            <el-button round plain @click=register_click>注册</el-button>
+                            <el-button name="login" type="success" round @click.native=login_click>登录</el-button>
+                            <el-button name="register" round plain @click.native=register_click>注册</el-button>
+                            <p class="error">{{errorMessage}}</p>
                         </el-form-item>
                     </el-form>
                 </div>
@@ -28,25 +29,49 @@
 
 <script>
     export default {
-        name: "login",
+        name: 'login',
         data(){
             return{
-                labelPosition: "right",
-                username: "",
-                password: ""
+                labelPosition: 'right',
+                username: '',
+                password: '',
+                errorMessage: ''
 
             }
         },
 
         methods:{
             dump: function() {
-                // self-explaintary
-                this.username = "";
-                this.password = "";
+                // self-explainable
+                this.username = '';
+                this.password = '';
             },
+
+            register_click: function() {
+                this.$http({
+                    method: 'POST',
+                    url: 'http://134.175.225.180:3000/mock/43/auth/register',
+                    params: {
+                        username: this.username,
+                        password: this.password
+                    }
+                }).then(
+                    (response) => {
+                        // success
+                        if (response.ok && response.body.status === 0) {
+                            this.errorMessage = '注册成功！';
+                        } else {
+                            this.errorMessage = response.body.error;
+                        }
+                    },
+                    (error) => {
+                        // error?
+                        this.errorMessage = error.body.error;
+                    }
+                );
+            },
+
             login_click: function() {
-                // post name: str; pwd: str; memo: str(true or false)
-                // 0->success; 1->doesn't match; 2->cookie doesn't exist or expired
                 this.$http({
                     method: 'POST',
                     url: 'http://134.175.225.180:3000/mock/43/auth/login',
@@ -57,16 +82,15 @@
                 }).then(
                     (response) => {
                         // success
-                        if (response.body.status === 0) {
+                        if (response.ok && response.body.status === 0) {
                             this.$router.push({path: '/mainPage'});
                         } else {
-                            alert(response.body.error);
+                            this.errorMessage = response.body.error;
                         }
                     },
                     (error) => {
-                        // error
-                        this.dump();
-                        alert(error);
+                        // error?
+                        this.errorMessage = error.body.error;
                     }
                 );
 
@@ -102,6 +126,9 @@
     }
     .top-align {
         margin-top: 10%;
+    }
+    .error {
+        color: red;
     }
 
 </style>
