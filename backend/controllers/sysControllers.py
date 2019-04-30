@@ -88,11 +88,12 @@ def sys_delete_controller():
 
 
 # Update old components / Insert
+# Only added to session, haven't committed
 def insert_or_update_components(old_comps, new_comps, col_name, table_class, systemname):
     for new_comp in new_comps:
         flag = True  # Insertion flag
         for old_comp in old_comps:
-            if old_comp[0] == new_comp[col_name]:
+            if old_comp[0] == new_comp[col_name]:  # Found as an old component
                 current_app.db.session.query(table_class).filter(Asset.assetname == new_comp[col_name]) \
                     .update({'val': new_comp['val'], 'description': new_comp['description']})
                 flag = False

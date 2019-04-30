@@ -1,8 +1,7 @@
-#!/usr/bin/env python 
-# -*- coding:utf-8 -*-
 from models import User
 from server import app
 from params import HTTP_OK, HTTP_UNKNOWN, HTTP_BADREQ, HTTP_UNAUTH
+from utils import md5
 
 
 class TestModels(object):
@@ -11,15 +10,18 @@ class TestModels(object):
         self.app = app
         self.app.testing = True
         self.client = self.app.test_client()
+        # Add an user for testing
+        new_user = User(username='__test__user1', password=md5('123'))
+        self.app.db.session.add(new_user)
+        self.app.db.session.commit()
 
     def teardown_class(self):
         # Delete users
-        self.app.db.session.query(User).filter(User.username == '__test__user').delete()
+        self.app.db.session.query(User).filter(User.username == '__test__user1').delete()
         self.app.db.session.commit()
         # Close connections
         self.app.db.session.remove()
         print('\n/auth/login ut complete!')
-
 
     def test_exist(self):
         # Invalid

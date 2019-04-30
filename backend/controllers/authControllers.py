@@ -56,7 +56,7 @@ def auth_login_controller():
     # Check whether this username is existed
     if user:
         #Check the password
-        if user.username==username and user.password==pwd:
+        if user.username == username and user.password == pwd:
             session['username'] = username
             return jsonify({'status': 0}), HTTP_OK
         else:
