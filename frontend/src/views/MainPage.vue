@@ -30,7 +30,6 @@
               <el-button @click="handleClick(scope.row)" type="text" size="small" style="font-size:16px;width:38px;height:20px">修改</el-button>
               <el-button type="text" size="small" style="font-size:16px;width:38px;height:20px">删除</el-button>
             </template>
-            </el-row>
           </el-table-column>
         </el-table>
       </el-main>
@@ -53,7 +52,7 @@ handleClick(row) {//进入该系统的编辑页
   })
 },
 getnew(){//进入新建系统页
-  this.$http.get('/new')
+  /*this.$http.get('/new')
       .then((response) => {
                         if (response.body.status === 0) {
                             this.$router.push({path: '/new'});
@@ -65,7 +64,8 @@ getnew(){//进入新建系统页
                         // error
                         this.dump();
                         alert(error);
-                    });
+                    });*/
+  this.$router.push({path: '/new'});
   }
 },
 data(){

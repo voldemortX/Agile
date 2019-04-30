@@ -22,7 +22,7 @@
         <el-button type="modify">修改</el-button>
         <el-button type="delete">删除</el-button>
       </div>
-      <el-table :data="tableData" border :header-cell-style="{background:'#FFFFFF'}":cell-style="{background:'#FFFFFF'}">
+      <el-table :data="tableData" border :header-cell-style="{background:'#FFFFFF'}" :cell-style="{background:'#FFFFFF'}">
         <el-table-column prop="assets" label="资产名称" width="260">
         </el-table-column>
         <el-table-column prop="integrity" label="保密性" width="140">
@@ -70,7 +70,7 @@
 
 <script>
 export default {
-  name: 'new',
+  name: '_new',
   data() {
     return {
       aim: '',
