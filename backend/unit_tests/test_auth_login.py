@@ -2,6 +2,7 @@ from models import User
 from server import app
 from params import HTTP_OK, HTTP_UNKNOWN, HTTP_BADREQ, HTTP_UNAUTH
 from utils import md5
+from flask import session
 
 
 class TestModels(object):
@@ -40,8 +41,10 @@ class TestModels(object):
         assert data['error'] == '用户名或密码输入错误'
 
         # Valid
-        res = self.client.post('/auth/login', json={'username': '__test__user1', 'password': '123'})
-        assert res.status_code == HTTP_OK
-        assert res.is_json is True
-        data = res.get_json()
-        assert data['status'] == 0
+        with self.client as c:
+            res = self.client.post('/auth/login', json={'username': '__test__user1', 'password': '123'})
+            assert res.status_code == HTTP_OK
+            assert res.is_json is True
+            data = res.get_json()
+            assert data['status'] == 0
+            assert session['username'] == '__test__user1'
