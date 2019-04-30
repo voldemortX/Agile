@@ -26,42 +26,50 @@ def sys_submit_controller():
         current_app.logger.error("Error in parsing requests:", exc_info=True)
         return jsonify({'status': 1, 'error': HTTP_BADREQ_TEXT}), HTTP_BADREQ
 
+    # Process the system first
     # If exists: update
     # Else: insert
     try:
         res = current_app.db.session.query(System).filter(System.systemname == systemname).first()
         if res is None:  # Insert
-            # Add the system first
             new_system = System(systemname=systemname, username=username, description=description, method=method, results=json.dumps(results))
             current_app.db.session.add(new_system)
-            # Add components
-            for asset in assets:
-                new_asset = Asset(systemname=systemname, assetname=asset['assetname'], val=asset['val'], description=asset['description'])
-                current_app.db.session.add(new_asset)
-            for threat in threats:
-                new_threat = Threat(systemname=systemname, threatname=threat['threatname'], val=threat['val'], description=threat['description'])
-                current_app.db.session.add(new_threat)
-            for vul in vulnerabilities:
-                new_vul = Vulnerability(systemname=systemname, vulname=vul['vulname'], val=vul['val'], description=vul['description'])
-                current_app.db.session.add(new_vul)
         else:  # Update
-            # Update the system first
             current_app.db.session.query(System).filter(System.systemname == systemname) \
                 .update({'description': description, 'method': method, 'results': json.dumps(results)})
-            # Query components
-            old_assets = current_app.db.session.query(Asset.assetname).filter(Asset.systemname == systemname).all()
-            old_threats = current_app.db.session.query(Threat.threatname).filter(Threat.systemname == systemname).all()
-            old_vuls = current_app.db.session.query(Vulnerability.vulname).filter(Vulnerability.systemname == systemname).all()
-            # Process components
-            insert_or_update_components(old_comps=old_assets, new_comps=assets, col_name='assetname', table_class=Asset, systemname=systemname)
-            insert_or_update_components(old_comps=old_threats, new_comps=threats, col_name='threatname', table_class=Threat, systemname=systemname)
-            insert_or_update_components(old_comps=old_vuls, new_comps=vulnerabilities, col_name='vulname', table_class=Vulnerability, systemname=systemname)
+        current_app.db.session.commit()
+
+    except:
+        current_app.logger.error("Error in inserting a new system:", exc_info=True)
+        current_app.db.session.rollback()
+        return jsonify({'status': 1, 'error': '数据库未知错误'}), HTTP_UNKNOWN
+
+    # Old components need to be substituted entirely
+    try:
+        # Delete old components
+        current_app.db.session.query(Asset).filter(Asset.systemname == systemname).delete()
+        current_app.db.session.query(Threat).filter(Threat.systemname == systemname).delete()
+        current_app.db.session.query(Vulnerability).filter(Vulnerability.systemname == systemname).delete()
+
+        # Add components
+        for asset in assets:
+            new_asset = Asset(systemname=systemname, assetname=asset['assetname'], val=asset['val'],
+                              description=asset['description'])
+            current_app.db.session.add(new_asset)
+        for threat in threats:
+            new_threat = Threat(systemname=systemname, threatname=threat['threatname'], val=threat['val'],
+                                description=threat['description'])
+            current_app.db.session.add(new_threat)
+        for vul in vulnerabilities:
+            new_vul = Vulnerability(systemname=systemname, vulname=vul['vulname'], val=vul['val'],
+                                    description=vul['description'])
+            current_app.db.session.add(new_vul)
 
         current_app.db.session.commit()
         return jsonify({'status': 0}), HTTP_OK
 
     except:
-        current_app.logger.error("Error in inserting a new user:", exc_info=True)
+        current_app.logger.error("Error in inserting a new system:", exc_info=True)
         current_app.db.session.rollback()
         return jsonify({'status': 1, 'error': '数据库未知错误'}), HTTP_UNKNOWN
 
@@ -85,19 +93,3 @@ def sys_fetch_all_controller():
 @read_session
 def sys_delete_controller():
     pass
-
-
-# Update old components / Insert
-# Only added to session, haven't committed
-def insert_or_update_components(old_comps, new_comps, col_name, table_class, systemname):
-    for new_comp in new_comps:
-        flag = True  # Insertion flag
-        for old_comp in old_comps:
-            if old_comp[0] == new_comp[col_name]:  # Found as an old component
-                current_app.db.session.query(table_class).filter(Asset.assetname == new_comp[col_name]) \
-                    .update({'val': new_comp['val'], 'description': new_comp['description']})
-                flag = False
-                break
-        if flag:
-            temp = table_class(systemname=systemname, assetname=new_comp[col_name], val=new_comp['val'], description=new_comp['description'])
-            current_app.db.session.add(temp)
