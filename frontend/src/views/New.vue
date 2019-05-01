@@ -7,6 +7,17 @@
                 <span>风险评估</span>
 
             </el-header>
+            <el-main style="text-align: center; background-color:#000000">
+                <el-row>
+                    <el-radio-group v-model="method">
+                        <el-radio :label="0">相乘法</el-radio>
+                        <el-radio :label="1">矩阵法</el-radio>
+                    </el-radio-group>
+                </el-row>
+                <el-row>
+                    <el-button type="primary">提交</el-button>
+                </el-row>
+            </el-main>
             <el-main style="text-align: center">
                 <el-tabs v-model="activeName" @tab-click.native="handleClick">
                     <el-tab-pane label="评估准备" name="first">
@@ -168,11 +179,45 @@
                 <el-button type="primary" @click.native="formThreatClick(-1)">确 定</el-button>
             </div>
         </el-dialog>
+
+        <el-dialog title="评估结果" :visible.sync="resultDialogVisible" :modal-append-to-body="false">
+            <div slot="footer" class="dialog-footer">
+                <el-button @click.native="resultDialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click.native="submitClick">确 定</el-button>
+            </div>
+        </el-dialog>
     </div>
 </template>
 
 <script>
+    // Matrix method:
+    // F[a][v] === level
+    const F = [
+        [1, 1, 2, 2, 3],
+        [1, 1, 2, 3, 4],
+        [1, 2, 3, 3, 4],
+        [1, 2, 3, 3, 5],
+        [2, 2, 4, 5, 5]
+    ];
+    // L[t][v] === level
+    const L = [
+        [1, 1, 2, 2, 3],
+        [1, 2, 2, 3, 4],
+        [1, 2, 3, 3, 4],
+        [2, 2, 3, 4, 5],
+        [2, 3, 4, 4, 5]
+    ];
+    // R[f][l] === level
+    const R = [
+        [1, 1, 2, 2, 3],
+        [1, 2, 2, 3, 3],
+        [1, 2, 3, 3, 4],
+        [2, 2, 3, 4, 4],
+        [2, 3, 4, 4, 5]
+    ];
+
     const map = ['很低', '低', '中', '高', '很高'];
+
     export default {
         name: '_new',
         data() {
@@ -180,6 +225,10 @@
                 // Page settings
                 activeName: 'first',
                 formLabelWidth: '120px',
+                assetDialogVisible: false,
+                threatDialogVisible: false,
+                vulDialogVisible: false,
+                resultDialogVisible: false,
 
                 // Tab data
                 aim: '',
@@ -190,9 +239,6 @@
                 ],
                 tableVul: [],
                 tableThreat: [],
-                assetDialogVisible: false,
-                threatDialogVisible: false,
-                vulDialogVisible: false,
 
                 // Form data
                 formAsset: {
@@ -213,10 +259,22 @@
                     rank: null,
                     va: [],
                     details: ''
-                }
+                },
+
+                // System data
+                systemname: 'test1',
+                method: 0,
+                tva_results: []
+
             }
         },
+
         methods: {
+            levelMultiply(val) {
+                // Can't have any malicious values at this point
+                return Math.ceil((val - 1) / 5);
+            },
+
             messageBox(title, text) {
                 this.$alert(text, title, {
                     confirmButtonText: '确定'
@@ -350,7 +408,64 @@
                     };
                     this.vulDialogVisible = false;
                 }
-            }
+            },
+
+            calcClick() {
+                // Calculate results
+                // Expand from v
+                for(let v of this.tableVul)
+                {
+                    // Search t
+                    for(let t of this.tableThreat)
+                    {
+                        let flag = false;
+                        for(let i of t.tv)
+                            if(i === v.vulnerability)
+                            {
+                                flag = true;
+                                break;
+                            }
+
+                        if(flag === true)
+                        {
+                            // Search a
+                            for(let a of this.tableAsset)
+                            {
+                                flag = false;
+                                for(let i of v.va)
+                                    if(i === a.asset)
+                                    {
+                                        flag = true;
+                                        break;
+                                    }
+
+                                if(flag === true)
+                                {
+                                    // append
+                                    let temp = {asset: a.asset, vulnerability: v.vulnerability, threat: t.threat,
+                                        level: 0};
+                                    if(this.method === 0)  // Multiply
+                                    {
+                                        let val = Math.sqrt(map.indexOf(a.rank) * map.indexOf(v.rank)) *
+                                            Math.sqrt(map.indexOf(v.rank) * map.indexOf(t.rank));
+                                        temp.level = this.levelMultiply(val);
+                                    }
+                                    else  // Matrix
+                                        temp.level = R[F[map.indexOf(a.rank)][map.indexOf(v.rank)]][L[map.indexOf(t.rank)][map.indexOf(v.rank)]];
+
+                                    this.tva_results.push(temp);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Show results
+            },
+
+            submitClick() {
+                // Submit a system to server
+            },
         }
     };
 </script>
