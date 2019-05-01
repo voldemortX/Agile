@@ -8,14 +8,14 @@
 
             </el-header>
             <el-main style="text-align: center">
-                <el-tabs v-model="activeName" @tab-click="handleClick">
+                <el-tabs v-model="activeName" @tab-click.native="handleClick">
                     <el-tab-pane label="评估准备" name="first">
                         <el-divider content-position="left">评估目标</el-divider>
-                        <el-input type="textarea" :rows="2" placeholder="请输入内容" v-model="aim"></el-input>
+                        <el-input type="textarea" :rows="5" placeholder="请输入内容" v-model="aim"></el-input>
                         <el-divider content-position="left">评估范围</el-divider>
-                        <el-input type="textarea" :rows="2" placeholder="请输入内容" v-model="range"></el-input>
+                        <el-input type="textarea" :rows="5" placeholder="请输入内容" v-model="range"></el-input>
                         <el-divider content-position="left">组建团队成员</el-divider>
-                        <el-input type="textarea" :rows="2" placeholder="请输入内容" v-model="team"></el-input>
+                        <el-input type="textarea" :rows="5" placeholder="请输入内容" v-model="team"></el-input>
                     </el-tab-pane>
                     <el-tab-pane label="资产评估" name="second">
                         <div style="float:left">
@@ -32,7 +32,7 @@
                             </el-table-column>
                             <el-table-column prop="confidentiality" label="完整性" width="140">
                             </el-table-column>
-                            <el-table-column prop="rank" label="资产价值" >
+                            <el-table-column prop="rank" label="资产价值" width="140">
                             </el-table-column>
                             <el-table-column prop="details" label="描述" >
                             </el-table-column>
@@ -102,7 +102,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item>
-                    <el-input type="textarea" :rows="2" placeholder="请输入资产描述" v-model="formAsset.details"></el-input>
+                    <el-input type="textarea" :rows="5" placeholder="请输入资产描述" v-model="formAsset.details"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -113,8 +113,8 @@
 
         <el-dialog title="添加脆弱性" :visible.sync="vulDialogVisible" :modal-append-to-body="false">
             <el-form :model="formVul">
-                <el-form-item label="资产名称" :label-width="formLabelWidth">
-                    <el-input v-model="formAsset.name" autocomplete="off" width="200px"></el-input>
+                <el-form-item label="脆弱性名称" :label-width="formLabelWidth">
+                    <el-input v-model="formVul.name" autocomplete="off" width="200px"></el-input>
                 </el-form-item>
                 <el-form-item label="脆弱性等级" :label-width="formLabelWidth">
                     <el-select v-model="formVul.rank" placeholder="请选择等级">
@@ -125,18 +125,47 @@
                         <el-option label="很低" value=1></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item>
+                <el-form-item label="关联已有资产" :label-width="formLabelWidth">
                     <el-checkbox-group v-model="formVul.va">
                         <el-checkbox v-for="i in tableAsset" :label="i.asset" :key="i.asset">{{i.asset}}</el-checkbox>
                     </el-checkbox-group>
                 </el-form-item>
                 <el-form-item>
-                    <el-input type="textarea" :rows="2" placeholder="请输入脆弱性描述" v-model="formVul.details"></el-input>
+                    <el-input type="textarea" :rows="5" placeholder="请输入脆弱性描述" v-model="formVul.details"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button @click.native="vulDialogVisible = false">取 消</el-button>
                 <el-button type="primary" @click.native="formVulClick(-1)">确 定</el-button>
+            </div>
+        </el-dialog>
+
+        <el-dialog title="添加威胁" :visible.sync="threatDialogVisible" :modal-append-to-body="false">
+            <el-form :model="formThreat">
+                <el-form-item label="威胁名称" :label-width="formLabelWidth">
+                    <el-input v-model="formThreat.name" autocomplete="off" width="200px"></el-input>
+                </el-form-item>
+                <el-form-item label="威胁等级" :label-width="formLabelWidth">
+                    <el-select v-model="formThreat.rank" placeholder="请选择等级">
+                        <el-option label="很高" value=5></el-option>
+                        <el-option label="高" value=4></el-option>
+                        <el-option label="中" value=3></el-option>
+                        <el-option label="低" value=2></el-option>
+                        <el-option label="很低" value=1></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="关联已有脆弱性" :label-width="formLabelWidth">
+                    <el-checkbox-group v-model="formThreat.tv">
+                        <el-checkbox v-for="i in tableVul" :label="i.vulnerability" :key="i.vulnerability">{{i.vulnerability}}</el-checkbox>
+                    </el-checkbox-group>
+                </el-form-item>
+                <el-form-item>
+                    <el-input type="textarea" :rows="5" placeholder="请输入脆弱性描述" v-model="formVul.details"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click.native="threatDialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click.native="formThreatClick(-1)">确 定</el-button>
             </div>
         </el-dialog>
     </div>
@@ -173,7 +202,12 @@
                     confidentiality: null,
                     details: ''
                 },
-                formThreat: {},
+                formThreat: {
+                    name: '',
+                    rank: null,
+                    tv: [],
+                    details: ''
+                },
                 formVul: {
                     name: '',
                     rank: null,
@@ -196,7 +230,7 @@
             formAssertClick(index) {
                 if(this.formAsset.name === '' || this.formAsset.confidentiality === null
                     || this.formAsset.integrity === null || this.formAsset.availability === null)
-                    this.messageBox('错误提示', '请正确选择安全等级！');
+                    this.messageBox('错误提示', '请完整填写必要信息！');
                 else {
                     // Calculate val
                     let val = this.formAsset.availability;
@@ -241,11 +275,81 @@
             },
 
             formThreatClick(index) {
+                if(this.formThreat.name === '' || this.formThreat.rank === null)
+                    this.messageBox('错误提示', '请完整填写必要信息！');
+                else
+                {
+                    // Move data
+                    let temp = {
+                        threat: this.formThreat.name,
+                        tv: this.formThreat.tv.toString(),
+                        details: this.formThreat.details,
+                        rank: map[this.formThreat.rank - 1]
+                    };
 
+                    if (index !== -1)  // Modify
+                        this.tableThreat[index] = temp;
+                    else  // Add
+                    {
+                        // Check
+                        for(let i of this.tableThreat)
+                            if(i.threat === temp.threat)
+                            {
+                                this.messageBox('错误提示', '脆弱性已存在！');
+                                return;
+                            }
+
+                        this.tableThreat.push(temp);
+                    }
+
+                    // Close dialog
+                    this.formThreat = {
+                        name: '',
+                        rank: null,
+                        va: [],
+                        details: ''
+                    };
+                    this.threatDialogVisible = false;
+                }
             },
 
             formVulClick(index) {
+                if(this.formVul.name === '' || this.formVul.rank === null)
+                    this.messageBox('错误提示', '请完整填写必要信息！');
+                else
+                {
+                    // Move data
+                    let temp = {
+                        vulnerability: this.formVul.name,
+                        va: this.formVul.va.toString(),
+                        details: this.formVul.details,
+                        rank: map[this.formVul.rank - 1]
+                    };
 
+                    if (index !== -1)  // Modify
+                        this.tableVul[index] = temp;
+                    else  // Add
+                    {
+                        // Check
+                        for(let i of this.tableVul)
+                            if(i.vulnerability === temp.vulnerability)
+                            {
+                                this.messageBox('错误提示', '脆弱性已存在！');
+                                return;
+                            }
+
+                        this.tableVul.push(temp);
+                    }
+
+                    // Close dialog
+                    this.formVul = {
+                        name: '',
+                        rank: null,
+                        va: [],
+                        details: ''
+                    };
+                    this.vulDialogVisible = false;
+                }
             }
         }
     };
