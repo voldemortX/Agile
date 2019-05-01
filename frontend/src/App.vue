@@ -18,7 +18,7 @@
       width: 100%;
       height: 100%;
       position: fixed;
-      background-color: #c0c1cc;
+      background-color: #ffffff;
   }
   body{
     margin:0;
