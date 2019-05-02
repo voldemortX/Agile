@@ -15,7 +15,7 @@
                     </el-radio-group>
                 </el-row>
                 <el-row>
-                    <el-button type="primary">提交</el-button>
+                    <el-button type="primary" @click.native="calcClick">提交</el-button>
                 </el-row>
             </el-main>
             <el-main style="text-align: center">
@@ -181,6 +181,12 @@
         </el-dialog>
 
         <el-dialog title="评估结果" :visible.sync="resultDialogVisible" :modal-append-to-body="false">
+            <el-table :data="tva_results" border :header-cell-style="{background:'#FFFFFF'}" :cell-style="{background:'#FFFFFF'}">
+                <el-table-column prop="asset" label="资产名称" width="140"></el-table-column>
+                <el-table-column prop="threat" label="威胁名称" width="140"></el-table-column>
+                <el-table-column prop="vulnerability" label="脆弱性名称" width="140"></el-table-column>
+                <el-table-column prop="level" label="风险等级" width="140"></el-table-column>
+            </el-table>
             <div slot="footer" class="dialog-footer">
                 <el-button @click.native="resultDialogVisible = false">取 消</el-button>
                 <el-button type="primary" @click.native="submitClick">确 定</el-button>
@@ -235,10 +241,17 @@
                 range: '',
                 team: '',
                 tableAsset: [
-                    {asset: '测试资产', confidentiality: '很高', integrity: '中', availability: '很低', rank: '很高', details: 'blabla'}
+                    {asset: '测试资产5', confidentiality: '很高', integrity: '中', availability: '很低', rank: '很高', details: 'blabla'},
+                    {asset: '测试资产4', confidentiality: '高', integrity: '中', availability: '很低', rank: '高', details: 'blabla'}
                 ],
-                tableVul: [],
-                tableThreat: [],
+                tableVul: [
+                    {vulnerability: '测试脆弱性5', rank: '很高', vaString: '测试资产5,测试资产4', va: ['测试资产5', '测试资产4'], details: 'bla'},
+                    {vulnerability: '测试脆弱性3', rank: '中', vaString: '测试资产5', va: ['测试资产5'], details: 'bla'}
+                ],
+                tableThreat: [
+                    {threat: '测试威胁3', rank: '中', tvString: '测试脆弱性5,测试脆弱性3', tv: ['测试脆弱性5', '测试脆弱性3'], details: 'bla'},
+                    {threat: '测试威胁1', rank: '很低', tvString: '测试脆弱性5', tv: ['测试脆弱性5'], details: 'bla'}
+                ],
 
                 // Form data
                 formAsset: {
@@ -340,7 +353,8 @@
                     // Move data
                     let temp = {
                         threat: this.formThreat.name,
-                        tv: this.formThreat.tv.toString(),
+                        tv: this.formThreat.tv,
+                        tvString: this.formThreat.tv.toString(),
                         details: this.formThreat.details,
                         rank: map[this.formThreat.rank - 1]
                     };
@@ -364,7 +378,7 @@
                     this.formThreat = {
                         name: '',
                         rank: null,
-                        va: [],
+                        tv: [],
                         details: ''
                     };
                     this.threatDialogVisible = false;
@@ -379,7 +393,8 @@
                     // Move data
                     let temp = {
                         vulnerability: this.formVul.name,
-                        va: this.formVul.va.toString(),
+                        va: this.formVul.va,
+                        vaString: this.formVul.va.toString(),
                         details: this.formVul.details,
                         rank: map[this.formVul.rank - 1]
                     };
@@ -413,6 +428,7 @@
             calcClick() {
                 // Calculate results
                 // Expand from v
+                this.tva_results = [];
                 for(let v of this.tableVul)
                 {
                     // Search t
@@ -446,12 +462,12 @@
                                         level: 0};
                                     if(this.method === 0)  // Multiply
                                     {
-                                        let val = Math.sqrt(map.indexOf(a.rank) * map.indexOf(v.rank)) *
-                                            Math.sqrt(map.indexOf(v.rank) * map.indexOf(t.rank));
+                                        let val = Math.sqrt((map.indexOf(a.rank) + 1) * (map.indexOf(v.rank) + 1)) *
+                                            Math.sqrt((map.indexOf(v.rank) + 1) * (map.indexOf(t.rank) + 1));
                                         temp.level = this.levelMultiply(val);
                                     }
                                     else  // Matrix
-                                        temp.level = R[F[map.indexOf(a.rank)][map.indexOf(v.rank)]][L[map.indexOf(t.rank)][map.indexOf(v.rank)]];
+                                        temp.level = R[F[map.indexOf(a.rank)][map.indexOf(v.rank)] - 1][L[map.indexOf(t.rank)][map.indexOf(v.rank)] - 1];
 
                                     this.tva_results.push(temp);
                                 }
@@ -461,10 +477,61 @@
                 }
 
                 // Show results
+                this.resultDialogVisible = true;
             },
 
             submitClick() {
                 // Submit a system to server
+                let tempMethod = '相乘法';
+                if(this.method === 1)
+                    tempMethod = '矩阵法';
+
+                let tempAsset = [];
+                let tempThreat = [];
+                let tempVul = [];
+                for(let i of this.tableAsset)
+                {
+                    let temp = {assetname: i.asset, val: map.indexOf(i.rank) + 1, description: i.details};
+                    tempAsset.push(temp);
+                }
+                for(let i of this.tableThreat)
+                {
+                    let temp = {threatname: i.threat, val: map.indexOf(i.rank) + 1, description: i.details};
+                    tempThreat.push(temp);
+                }
+                for(let i of this.tableVul)
+                {
+                    let temp = {vulname: i.vulnerability, val: map.indexOf(i.rank) + 1, description: i.details};
+                    tempVul.push(temp);
+                }
+
+                this.$http({
+                    method: 'POST',
+                    url: 'http://134.175.225.180:3000/mock/43/sys/submit',
+                    params: {
+                        systemname: this.systemname,
+                        description: '目标：' + this.aim + '&&&范围：' + this.range + '&&&成员：' + this.team + '&&&',
+                        method: tempMethod,
+                        assets: tempAsset,
+                        threats: tempThreat,
+                        vulnerabilities: tempVul,
+                        results: this.tva_results
+                    }
+                }).then(
+                    (response) => {
+                        // success
+                        if (response.ok && response.body.status === 0) {
+                            this.messageBox('提示', '结果已提交至服务器');
+                        } else {
+                            this.messageBox('提交错误', response.body.error);
+                        }
+                    },
+                    (error) => {
+                        // error?
+                        this.messageBox('提交错误', error.body.error);
+                    }
+                );
+                this.resultDialogVisible = false;
             },
         }
     };
