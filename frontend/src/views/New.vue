@@ -507,7 +507,7 @@
 
                 this.$http({
                     method: 'POST',
-                    url: 'http://134.175.225.180:3000/mock/43/sys/submit',
+                    url: 'http://localhost:7777/sys/submit',
                     params: {
                         systemname: this.systemname,
                         description: '目标：' + this.aim + '&&&范围：' + this.range + '&&&成员：' + this.team + '&&&',

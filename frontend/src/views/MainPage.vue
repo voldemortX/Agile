@@ -14,7 +14,7 @@
         <span>已评估系统</span>
       </el-header>
       <el-main>
-        <el-table :data="tableData" border :header-cell-style="{background:'#FFFFFF'}":cell-style="{background:'#FFFFFF'}">
+        <el-table :data="tableData" border :header-cell-style="{background:'#FFFFFF'}" :cell-style="{background:'#FFFFFF'}">
           <el-table-column prop="systemname" label="SystemID" width="250">
           </el-table-column>
           <el-table-column prop="method" label="Method" width="140">

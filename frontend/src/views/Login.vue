@@ -50,7 +50,7 @@
             register_click: function() {
                 this.$http({
                     method: 'POST',
-                    url: 'http://134.175.225.180:3000/mock/43/auth/register',
+                    url: 'http://localhost:7777/auth/register',
                     params: {
                         username: this.username,
                         password: this.password
@@ -74,7 +74,7 @@
             login_click: function() {
                 this.$http({
                     method: 'POST',
-                    url: 'http://134.175.225.180:3000/mock/43/auth/login',
+                    url: 'http://localhost:7777/auth/login',
                     params: {
                         username: this.username,
                         password: this.password
