@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from params import appConfig
 from myLog import init_logger, log_path
@@ -11,7 +11,12 @@ app.config.from_mapping(appConfig)
 app.db = SQLAlchemy(app)
 app.register_blueprint(blueprint_auth)
 app.register_blueprint(blueprint_sys)
+print(app.template_folder)
 
+
+@app.route('/')
+def index():
+    return render_template("index.html")
 
 # Database session management suggested by zyf
 @app.teardown_request

@@ -9,6 +9,7 @@ HTTP_UNAUTH = 401
 # Flask app parameters
 secretKey = b"/[\xec\nabcde'L2x76_"  # Session key
 appConfig = {
+                'STATIC_FOLDER': './static',
                 'SECRET_KEY': secretKey,
                 'DEBUG': False,
                 'SQLALCHEMY_DATABASE_URI': 'mysql+pymysql://root:fshm0113@localhost:3306/agile'

@@ -507,8 +507,9 @@
 
                 this.$http({
                     method: 'POST',
-                    url: 'http://localhost:7777/sys/submit',
-                    params: {
+                    url: '/sys/submit',
+                    emulateJSON: true,
+                    body: JSON.stringify({
                         systemname: this.systemname,
                         description: '目标：' + this.aim + '&&&范围：' + this.range + '&&&成员：' + this.team + '&&&',
                         method: tempMethod,
@@ -516,7 +517,7 @@
                         threats: tempThreat,
                         vulnerabilities: tempVul,
                         results: this.tva_results
-                    }
+                    })
                 }).then(
                     (response) => {
                         // success

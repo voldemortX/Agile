@@ -50,11 +50,12 @@
             register_click: function() {
                 this.$http({
                     method: 'POST',
-                    url: 'http://localhost:7777/auth/register',
-                    params: {
+                    url: '/auth/register',
+                    emulateJSON: true,
+                    body: JSON.stringify({
                         username: this.username,
                         password: this.password
-                    }
+                    })
                 }).then(
                     (response) => {
                         // success
@@ -74,11 +75,12 @@
             login_click: function() {
                 this.$http({
                     method: 'POST',
-                    url: 'http://localhost:7777/auth/login',
-                    params: {
+                    url: '/auth/login',
+                    emulateJSON: true,
+                    body: JSON.stringify({
                         username: this.username,
                         password: this.password
-                    }
+                    })
                 }).then(
                     (response) => {
                         // success
