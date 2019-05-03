@@ -12,5 +12,5 @@ appConfig = {
                 'STATIC_FOLDER': './static',
                 'SECRET_KEY': secretKey,
                 'DEBUG': False,
-                'SQLALCHEMY_DATABASE_URI': 'mysql+pymysql://root:fshm0113@localhost:3306/agile'
+                'SQLALCHEMY_DATABASE_URI': 'mysql+pymysql://root:123456@localhost:3306/agile'
             }
