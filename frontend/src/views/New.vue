@@ -409,15 +409,20 @@
                 // Fill data
                 this.formAsset.name = this.tableAsset[index].asset;
                 this.formAsset.details = this.tableAsset[index].description;
-                //this.formAsset.confidentiality = this.tableAsset[index].confidentiality;
-                //this.formAsset.integrity = this.tableAsset[index].integrity;
-                //this.formAsset.availability = this.tableAsset[index].availability;
-                this.formAsset.confidentiality = Number(map.indexOf(this.tableAsset[index].confidentiality) + 1);
-                this.formAsset.integrity = map.indexOf(this.tableAsset[index].integrity) + 1;
-                this.formAsset.availability = map.indexOf(this.tableAsset[index].availability) + 1;
+                this.formAsset.confidentiality = String(map.indexOf(this.tableAsset[index].confidentiality) + 1);
+                this.formAsset.integrity = String(map.indexOf(this.tableAsset[index].integrity) + 1);
+                this.formAsset.availability = String(map.indexOf(this.tableAsset[index].availability) + 1);
 
                 // Open the same dialog as ADD
                 this.assetDialogVisible = true;
+
+            },
+
+            formVulModify(index) {
+
+            },
+
+            formThreatModify(index) {
 
             },
 
