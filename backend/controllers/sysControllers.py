@@ -90,7 +90,7 @@ def sys_query_controller():
         system = User.query.filter(System.systemname == systemname).first()
         # Check whether this systemname is existed
         if system :
-            # Check the password
+
             current_app.db.session.query(System.systemname, System.username, System.method, System.results,
                                          System.description, System.createtime).filter(
                 System.systemname == systemname).all()
@@ -109,7 +109,6 @@ def sys_query_controller():
 @read_session
 def sys_fetch_all_controller():
     pass
-
 
 @blueprint_sys.route('/delete', methods=['DELETE'])
 @error_guard('/sys/delete')
