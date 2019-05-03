@@ -40,7 +40,7 @@ class TestModels(object):
 
     def test_exist(self):
         # Invalid
-        res = self.client.post('/sys/query', json={'systemname': '__test__system2'})
+        res = self.client.get('/sys/query', json={'systemname': '__test__system2'})
         assert res.status_code == HTTP_OK
         assert res.is_json is True
         data = res.get_json()
@@ -49,7 +49,7 @@ class TestModels(object):
 
         # Valid
         with self.client as c:
-            res = self.client.post('/sys/query', json={'systemname': '__test__system'})
+            res = self.client.get('/sys/query', json={'systemname': '__test__system'})
             assert res.status_code == HTTP_OK
             assert res.is_json is True
             data = res.get_json()
