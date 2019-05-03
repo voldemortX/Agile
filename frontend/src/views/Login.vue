@@ -50,7 +50,8 @@
             register_click: function() {
                 this.$http({
                     method: 'POST',
-                    url: '/auth/register',
+                    url: 'http://134.175.225.180:3000/mock/43/auth/register',
+                    // url: '/auth/register',
                     emulateJSON: true,
                     body: JSON.stringify({
                         username: this.username,
@@ -75,7 +76,8 @@
             login_click: function() {
                 this.$http({
                     method: 'POST',
-                    url: '/auth/login',
+                    url: 'http://134.175.225.180:3000/mock/43/auth/login',
+                    //url: '/auth/login',
                     emulateJSON: true,
                     body: JSON.stringify({
                         username: this.username,

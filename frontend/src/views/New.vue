@@ -15,7 +15,7 @@
                     </el-radio-group>
                 </el-row>
                 <el-row>
-                    <el-button type="primary" @click.native="calcClick">提交</el-button>
+                    <el-button name="calc" type="primary" @click.native="calcClick">提交</el-button>
                 </el-row>
             </el-main>
             <el-main style="text-align: center">
@@ -58,7 +58,7 @@
                         <el-table :data="tableVul" border :header-cell-style="{background:'#FFFFFF'}" :cell-style="{background:'#FFFFFF'}">
                             <el-table-column prop="vulnerability" label="脆弱性名称" width="260"></el-table-column>
                             <el-table-column prop="rank" label="脆弱性等级" width="140"></el-table-column>
-                            <el-table-column prop="va" label="资产关联" width="140"></el-table-column>
+                            <el-table-column prop="vaString" label="资产关联" width="140"></el-table-column>
                             <el-table-column prop="details" label="描述"></el-table-column>
                         </el-table>
                     </el-tab-pane>
@@ -71,7 +71,7 @@
                         <el-table :data="tableThreat" border :header-cell-style="{background:'#FFFFFF'}" :cell-style="{background:'#FFFFFF'}">
                             <el-table-column prop="threat" label="威胁名称" width="260"></el-table-column>
                             <el-table-column prop="rank" label="威胁等级" width="140"></el-table-column>
-                            <el-table-column prop="tv" label="威胁的脆弱性关联" width="140"></el-table-column>
+                            <el-table-column prop="tvString" label="威胁的脆弱性关联" width="140"></el-table-column>
                             <el-table-column prop="details" label="描述"></el-table-column>
                         </el-table>
                     </el-tab-pane>
@@ -240,18 +240,9 @@
                 aim: '',
                 range: '',
                 team: '',
-                tableAsset: [
-                    {asset: '测试资产5', confidentiality: '很高', integrity: '中', availability: '很低', rank: '很高', details: 'blabla'},
-                    {asset: '测试资产4', confidentiality: '高', integrity: '中', availability: '很低', rank: '高', details: 'blabla'}
-                ],
-                tableVul: [
-                    {vulnerability: '测试脆弱性5', rank: '很高', vaString: '测试资产5,测试资产4', va: ['测试资产5', '测试资产4'], details: 'bla'},
-                    {vulnerability: '测试脆弱性3', rank: '中', vaString: '测试资产5', va: ['测试资产5'], details: 'bla'}
-                ],
-                tableThreat: [
-                    {threat: '测试威胁3', rank: '中', tvString: '测试脆弱性5,测试脆弱性3', tv: ['测试脆弱性5', '测试脆弱性3'], details: 'bla'},
-                    {threat: '测试威胁1', rank: '很低', tvString: '测试脆弱性5', tv: ['测试脆弱性5'], details: 'bla'}
-                ],
+                tableAsset: [],
+                tableVul: [],
+                tableThreat: [],
 
                 // Form data
                 formAsset: {
@@ -275,7 +266,7 @@
                 },
 
                 // System data
-                systemname: 'test1',
+                systemname: '',
                 method: 0,
                 tva_results: []
 
@@ -504,10 +495,10 @@
                     let temp = {vulname: i.vulnerability, val: map.indexOf(i.rank) + 1, description: i.details};
                     tempVul.push(temp);
                 }
-
                 this.$http({
                     method: 'POST',
-                    url: '/sys/submit',
+                    url: 'http://134.175.225.180:3000/mock/43/sys/submit',
+                    // url: '/sys/submit',
                     emulateJSON: true,
                     body: JSON.stringify({
                         systemname: this.systemname,
