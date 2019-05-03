@@ -31,8 +31,6 @@
                     <el-tab-pane label="资产评估" name="second">
                         <div style="float:left">
                             <el-button type="add" @click.native="assetDialogVisible = true">添加</el-button>
-                            <el-button type="modify">修改</el-button>
-                            <el-button type="delete">删除</el-button>
                         </div>
                         <el-table :data="tableAsset" border :header-cell-style="{background:'#FFFFFF'}" :cell-style="{background:'#FFFFFF'}">
                             <el-table-column prop="asset" label="资产名称" width="260">
@@ -52,8 +50,6 @@
                     <el-tab-pane label="脆弱性评估" name="third">
                         <div style="float:left">
                             <el-button type="add" @click.native="vulDialogVisible = true">添加</el-button>
-                            <el-button type="modify">修改</el-button>
-                            <el-button type="delete">删除</el-button>
                         </div>
                         <el-table :data="tableVul" border :header-cell-style="{background:'#FFFFFF'}" :cell-style="{background:'#FFFFFF'}">
                             <el-table-column prop="vulnerability" label="脆弱性名称" width="260"></el-table-column>
@@ -65,8 +61,6 @@
                     <el-tab-pane label="威胁评估" name="fourth">
                         <div style="float:left">
                             <el-button type="add" @click.native="threatDialogVisible = true">添加</el-button>
-                            <el-button type="modify">修改</el-button>
-                            <el-button type="delete">删除</el-button>
                         </div>
                         <el-table :data="tableThreat" border :header-cell-style="{background:'#FFFFFF'}" :cell-style="{background:'#FFFFFF'}">
                             <el-table-column prop="threat" label="威胁名称" width="260"></el-table-column>
@@ -480,18 +474,22 @@
                 let tempAsset = [];
                 let tempThreat = [];
                 let tempVul = [];
+                let tempResults = {tva_results: this.tva_results, tv_results: {}, va_results: {}};
                 for(let i of this.tableAsset)
                 {
-                    let temp = {assetname: i.asset, val: map.indexOf(i.rank) + 1, description: i.details};
+                    let temp = {assetname: i.asset, val: map.indexOf(i.rank) + 1,
+                        description: i.details + '&&&' + i.confidentiality + '&&&' + i.integrity + '&&&' + i.availability + '&&&'};
                     tempAsset.push(temp);
                 }
                 for(let i of this.tableThreat)
                 {
+                    tempResults.tv_results[i.threat] = i.tv;
                     let temp = {threatname: i.threat, val: map.indexOf(i.rank) + 1, description: i.details};
                     tempThreat.push(temp);
                 }
                 for(let i of this.tableVul)
                 {
+                    tempResults.va_results[i.vulnerability] = i.va;
                     let temp = {vulname: i.vulnerability, val: map.indexOf(i.rank) + 1, description: i.details};
                     tempVul.push(temp);
                 }
@@ -507,7 +505,7 @@
                         assets: tempAsset,
                         threats: tempThreat,
                         vulnerabilities: tempVul,
-                        results: this.tva_results
+                        results: tempResults
                     })
                 }).then(
                     (response) => {
