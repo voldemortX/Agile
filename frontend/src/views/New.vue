@@ -35,15 +35,21 @@
                         <el-table :data="tableAsset" border :header-cell-style="{background:'#FFFFFF'}" :cell-style="{background:'#FFFFFF'}">
                             <el-table-column prop="asset" label="资产名称" width="260">
                             </el-table-column>
-                            <el-table-column prop="integrity" label="保密性" width="140">
+                            <el-table-column prop="integrity" label="完整性" width="140">
                             </el-table-column>
                             <el-table-column prop="availability" label="可用性" width="140">
                             </el-table-column>
-                            <el-table-column prop="confidentiality" label="完整性" width="140">
+                            <el-table-column prop="confidentiality" label="保密性" width="140">
                             </el-table-column>
                             <el-table-column prop="rank" label="资产价值" width="140">
                             </el-table-column>
                             <el-table-column prop="details" label="描述" >
+                            </el-table-column>
+                            <el-table-column fixed="right" label="操作" width="180">
+                                <template slot-scope="scope">
+                                    <el-button @click.native="formAssetModify(scope.$index)" type="text" size="small" style="font-size:16px;width:38px;height:20px">修改</el-button>
+                                    <el-button @click.native="formDelete(scope.$index, tableAsset)" type="text" size="small" style="font-size:16px;width:38px;height:20px">删除</el-button>
+                                </template>
                             </el-table-column>
                         </el-table>
                     </el-tab-pane>
@@ -79,7 +85,7 @@
                 <el-form-item label="资产名称" :label-width="formLabelWidth">
                     <el-input v-model="formAsset.name" autocomplete="off" width="200px"></el-input>
                 </el-form-item>
-                <el-form-item label="机密性" :label-width="formLabelWidth">
+                <el-form-item label="保密性" :label-width="formLabelWidth">
                     <el-select v-model="formAsset.confidentiality" placeholder="请选择安全等级">
                         <el-option label="很高" value=5></el-option>
                         <el-option label="高" value=4></el-option>
@@ -112,7 +118,7 @@
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button @click.native="assetDialogVisible = false">取 消</el-button>
-                <el-button type="primary" @click.native="formAssertClick(-1)">确 定</el-button>
+                <el-button type="primary" @click.native="formAssertClick">确 定</el-button>
             </div>
         </el-dialog>
 
@@ -141,7 +147,7 @@
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button @click.native="vulDialogVisible = false">取 消</el-button>
-                <el-button type="primary" @click.native="formVulClick(-1)">确 定</el-button>
+                <el-button type="primary" @click.native="formVulClick">确 定</el-button>
             </div>
         </el-dialog>
 
@@ -170,7 +176,7 @@
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button @click.native="threatDialogVisible = false">取 消</el-button>
-                <el-button type="primary" @click.native="formThreatClick(-1)">确 定</el-button>
+                <el-button type="primary" @click.native="formThreatClick">确 定</el-button>
             </div>
         </el-dialog>
 
@@ -234,9 +240,21 @@
                 aim: '',
                 range: '',
                 team: '',
-                tableAsset: [],
-                tableVul: [],
-                tableThreat: [],
+                tableAsset: [
+                    {asset: '测试资产5', confidentiality: '很高', integrity: '中', availability: '很低', rank: '很高', details: 'blabla'},
+                    {asset: '测试资产4', confidentiality: '高', integrity: '中', availability: '很低', rank: '高', details: 'blabla'}
+                ],
+                tableVul: [
+                    {vulnerability: '测试脆弱性5', rank: '很高', vaString: '测试资产5,测试资产4', va: ['测试资产5', '测试资产4'], details: 'bla'},
+                    {vulnerability: '测试脆弱性3', rank: '中', vaString: '测试资产5', va: ['测试资产5'], details: 'bla'}
+                ],
+                tableThreat: [
+                    {threat: '测试威胁3', rank: '中', tvString: '测试脆弱性5,测试脆弱性3', tv: ['测试脆弱性5', '测试脆弱性3'], details: 'bla'},
+                    {threat: '测试威胁1', rank: '很低', tvString: '测试脆弱性5', tv: ['测试脆弱性5'], details: 'bla'}
+                ],
+                // tableAsset: [],
+                // tableVul: [],
+                // tableThreat: [],
 
                 // Form data
                 formAsset: {
@@ -283,7 +301,7 @@
                 console.log(tab, event);
             },
 
-            formAssertClick(index) {
+            formAssertClick() {
                 if(this.formAsset.name === '' || this.formAsset.confidentiality === null
                     || this.formAsset.integrity === null || this.formAsset.availability === null)
                     this.messageBox('错误提示', '请完整填写必要信息！');
@@ -304,33 +322,26 @@
                         rank: map[val - 1]
                     };
 
-                    if (index !== -1)  // Modify
-                        this.tableAsset[index] = temp;
-                    else  // Add
-                    {
-                        // Check
-                        for(let i of this.tableAsset)
-                            if(i.asset === temp.asset)
-                            {
-                                this.messageBox('错误提示', '资产已存在！');
-                                return;
-                            }
+                    // Check&Delete
+                    for(let i = 0; i < this.tableAsset.length; ++i)
+                        if(this.tableAsset[i].asset === temp.asset)
+                            this.tableAsset.splice(i, 1);
 
-                        this.tableAsset.push(temp);
-                    }
+                    this.tableAsset.push(temp);
 
                     // Close dialog
                     this.formAsset = {
                         name: '',
                         availability: null,
                         integrity: null,
-                        confidentiality: null
+                        confidentiality: null,
+                        details: ''
                     };
                     this.assetDialogVisible = false;
                 }
             },
 
-            formThreatClick(index) {
+            formThreatClick() {
                 if(this.formThreat.name === '' || this.formThreat.rank === null)
                     this.messageBox('错误提示', '请完整填写必要信息！');
                 else
@@ -344,20 +355,12 @@
                         rank: map[this.formThreat.rank - 1]
                     };
 
-                    if (index !== -1)  // Modify
-                        this.tableThreat[index] = temp;
-                    else  // Add
-                    {
-                        // Check
-                        for(let i of this.tableThreat)
-                            if(i.threat === temp.threat)
-                            {
-                                this.messageBox('错误提示', '脆弱性已存在！');
-                                return;
-                            }
+                    // Check&Delete
+                    for(let i = 0; i < this.tableThreat.length; ++i)
+                        if(this.tableThreat[i].threat === temp.threat)
+                            this.tableThreat.splice(i, 1);
 
-                        this.tableThreat.push(temp);
-                    }
+                    this.tableThreat.push(temp);
 
                     // Close dialog
                     this.formThreat = {
@@ -370,7 +373,7 @@
                 }
             },
 
-            formVulClick(index) {
+            formVulClick() {
                 if(this.formVul.name === '' || this.formVul.rank === null)
                     this.messageBox('错误提示', '请完整填写必要信息！');
                 else
@@ -384,20 +387,12 @@
                         rank: map[this.formVul.rank - 1]
                     };
 
-                    if (index !== -1)  // Modify
-                        this.tableVul[index] = temp;
-                    else  // Add
-                    {
-                        // Check
-                        for(let i of this.tableVul)
-                            if(i.vulnerability === temp.vulnerability)
-                            {
-                                this.messageBox('错误提示', '脆弱性已存在！');
-                                return;
-                            }
+                    // Check&Delete
+                    for(let i = 0; i < this.tableVul.length; ++i)
+                        if(this.tableVul[i].vulnerability === temp.vulnerability)
+                            this.tableVul.splice(i, 1);
 
-                        this.tableVul.push(temp);
-                    }
+                    this.tableVul.push(temp);
 
                     // Close dialog
                     this.formVul = {
@@ -408,6 +403,26 @@
                     };
                     this.vulDialogVisible = false;
                 }
+            },
+
+            formAssetModify(index) {
+                // Fill data
+                this.formAsset.name = this.tableAsset[index].asset;
+                this.formAsset.details = this.tableAsset[index].description;
+                //this.formAsset.confidentiality = this.tableAsset[index].confidentiality;
+                //this.formAsset.integrity = this.tableAsset[index].integrity;
+                //this.formAsset.availability = this.tableAsset[index].availability;
+                this.formAsset.confidentiality = Number(map.indexOf(this.tableAsset[index].confidentiality) + 1);
+                this.formAsset.integrity = map.indexOf(this.tableAsset[index].integrity) + 1;
+                this.formAsset.availability = map.indexOf(this.tableAsset[index].availability) + 1;
+
+                // Open the same dialog as ADD
+                this.assetDialogVisible = true;
+
+            },
+
+            formDelete(index, rows) {
+                rows.splice(index, 1);
             },
 
             calcClick() {
