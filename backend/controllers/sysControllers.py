@@ -74,7 +74,7 @@ def sys_submit_controller():
         return jsonify({'status': 1, 'error': '数据库未知错误'}), HTTP_UNKNOWN
 
 
-@blueprint_sys.route('/query', methods=['POST'])
+@blueprint_sys.route('/query', methods=['GET'])
 @error_guard('/sys/query')
 @read_session
 def sys_query_controller():
@@ -108,7 +108,21 @@ def sys_query_controller():
 @error_guard('/sys/fetch_all')
 @read_session
 def sys_fetch_all_controller():
-    pass
+    username = session['username']
+    try:
+        system = User.query.filter(System.username == username).first()
+        if system:
+            current_app.db.session.query(System.systemname, System.username, System.method, System.results,
+                                     System.description, System.createtime).filter(System.username == username).all()
+            return jsonify({'status': 0}), HTTP_OK
+        else:
+            return jsonify({'status': 1, 'error': '您还没有测试任何系统'}), HTTP_OK
+
+    except:
+        current_app.logger.error("Error in fetching a new system:", exc_info=True)
+        current_app.db.session.rollback()
+        return jsonify({'status': 1, 'error': '数据库未知错误'}), HTTP_UNKNOWN
+
 
 @blueprint_sys.route('/delete', methods=['DELETE'])
 @error_guard('/sys/delete')
