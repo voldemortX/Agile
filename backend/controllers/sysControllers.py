@@ -108,16 +108,19 @@ def sys_query_controller():
 def sys_fetch_all_controller():
     username = session['username']
     try:
-        system = User.query.filter(System.username == username).first()
-        if system:
-            current_app.db.session.query(System.systemname, System.username, System.method, System.results,
+        res = current_app.db.session.query(System.systemname, System.username, System.method, System.results,
                                      System.description, System.createtime).filter(System.username == username).all()
-            return jsonify({'status': 0}), HTTP_OK
-        else:
+        if res is None:
             return jsonify({'status': 1, 'error': '您还没有测试任何系统'}), HTTP_OK
+        else:
+            systems = []
+            for i in res:
+                temp = {'systemname': i[0], 'method': i[2], 'results': json.loads(i[3]), 'description': i[4], 'createtime': i[5]}
+                systems.append(temp)
+            return jsonify({'status': 0, 'systems': systems}), HTTP_OK
 
     except:
-        current_app.logger.error("Error in fetching a new system:", exc_info=True)
+        current_app.logger.error("Error in fetching systems:", exc_info=True)
         current_app.db.session.rollback()
         return jsonify({'status': 1, 'error': '数据库未知错误'}), HTTP_UNKNOWN
 
