@@ -10,8 +10,10 @@
   },
   "dependencies": {
     "core-js": "^2.6.5",
+    "echarts": "^4.2.1",
     "electron": "^5.0.0",
     "element-ui": "^2.4.5",
+    "officegen": "^0.6.0",
     "vue": "^2.6.10",
     "vue-resource": "^1.5.1",
     "vue-router": "^3.0.3"

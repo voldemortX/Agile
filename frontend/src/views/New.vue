@@ -62,6 +62,12 @@
                             <el-table-column prop="rank" label="脆弱性等级" width="140"></el-table-column>
                             <el-table-column prop="vaString" label="资产关联" width="140"></el-table-column>
                             <el-table-column prop="details" label="描述"></el-table-column>
+                            <el-table-column fixed="right" label="操作" width="180">
+                                <template slot-scope="scope">
+                                    <el-button @click.native="formVulModify(scope.$index)" type="text" size="small" style="font-size:16px;width:38px;height:20px">修改</el-button>
+                                    <el-button @click.native="formDelete(scope.$index, tableVul)" type="text" size="small" style="font-size:16px;width:38px;height:20px">删除</el-button>
+                                </template>
+                            </el-table-column>
                         </el-table>
                     </el-tab-pane>
                     <el-tab-pane label="威胁评估" name="fourth">
@@ -80,7 +86,7 @@
         </el-container>
 
         <!-- dialogs -->
-        <el-dialog title="添加资产" :visible.sync="assetDialogVisible" :modal-append-to-body="false">
+        <el-dialog title="添加资产" :visible.sync="assetDialogVisible" :modal-append-to-body="false" :show-close="false">
             <el-form :model="formAsset">
                 <el-form-item label="资产名称" :label-width="formLabelWidth">
                     <el-input v-model="formAsset.name" autocomplete="off" width="200px"></el-input>
@@ -117,12 +123,12 @@
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
-                <el-button @click.native="assetDialogVisible = false">取 消</el-button>
+                <el-button @click.native="dialogAssetClose">取 消</el-button>
                 <el-button type="primary" @click.native="formAssertClick">确 定</el-button>
             </div>
         </el-dialog>
 
-        <el-dialog title="添加脆弱性" :visible.sync="vulDialogVisible" :modal-append-to-body="false">
+        <el-dialog title="添加脆弱性" :visible.sync="vulDialogVisible" :modal-append-to-body="false" :show-close="false">
             <el-form :model="formVul">
                 <el-form-item label="脆弱性名称" :label-width="formLabelWidth">
                     <el-input v-model="formVul.name" autocomplete="off" width="200px"></el-input>
@@ -146,12 +152,12 @@
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
-                <el-button @click.native="vulDialogVisible = false">取 消</el-button>
+                <el-button @click.native="dialogVulClose">取 消</el-button>
                 <el-button type="primary" @click.native="formVulClick">确 定</el-button>
             </div>
         </el-dialog>
 
-        <el-dialog title="添加威胁" :visible.sync="threatDialogVisible" :modal-append-to-body="false">
+        <el-dialog title="添加威胁" :visible.sync="threatDialogVisible" :modal-append-to-body="false" :show-close="false">
             <el-form :model="formThreat">
                 <el-form-item label="威胁名称" :label-width="formLabelWidth">
                     <el-input v-model="formThreat.name" autocomplete="off" width="200px"></el-input>
@@ -175,7 +181,7 @@
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
-                <el-button @click.native="threatDialogVisible = false">取 消</el-button>
+                <el-button @click.native="dialogThreatClose">取 消</el-button>
                 <el-button type="primary" @click.native="formThreatClick">确 定</el-button>
             </div>
         </el-dialog>
@@ -301,6 +307,37 @@
                 console.log(tab, event);
             },
 
+            dialogAssetClose() {
+                this.formAsset = {
+                    name: '',
+                    availability: null,
+                    integrity: null,
+                    confidentiality: null,
+                    details: ''
+                };
+                this.assetDialogVisible = false;
+            },
+
+            dialogVulClose() {
+                this.formVul = {
+                    name: '',
+                    rank: null,
+                    va: [],
+                    details: ''
+                };
+                this.vulDialogVisible = false;
+            },
+
+            dialogThreatClose() {
+                this.formThreat = {
+                    name: '',
+                    rank: null,
+                    tv: [],
+                    details: ''
+                };
+                this.threatDialogVisible = false;
+            },
+
             formAssertClick() {
                 if(this.formAsset.name === '' || this.formAsset.confidentiality === null
                     || this.formAsset.integrity === null || this.formAsset.availability === null)
@@ -330,14 +367,7 @@
                     this.tableAsset.push(temp);
 
                     // Close dialog
-                    this.formAsset = {
-                        name: '',
-                        availability: null,
-                        integrity: null,
-                        confidentiality: null,
-                        details: ''
-                    };
-                    this.assetDialogVisible = false;
+                    this.dialogAssetClose();
                 }
             },
 
@@ -363,13 +393,7 @@
                     this.tableThreat.push(temp);
 
                     // Close dialog
-                    this.formThreat = {
-                        name: '',
-                        rank: null,
-                        tv: [],
-                        details: ''
-                    };
-                    this.threatDialogVisible = false;
+                    this.dialogThreatClose();
                 }
             },
 
@@ -395,13 +419,7 @@
                     this.tableVul.push(temp);
 
                     // Close dialog
-                    this.formVul = {
-                        name: '',
-                        rank: null,
-                        va: [],
-                        details: ''
-                    };
-                    this.vulDialogVisible = false;
+                    this.dialogVulClose();
                 }
             },
 
@@ -419,11 +437,25 @@
             },
 
             formVulModify(index) {
+                // Fill data
+                this.formVul.name = this.tableVul[index].vulnerability;
+                this.formVul.details = this.tableVul[index].details;
+                this.formVul.rank = String(map.indexOf(this.tableVul[index].rank) + 1);
+                this.formVul.va = this.tableVul[index].va;
 
+                // Open the same dialog as ADD
+                this.vulDialogVisible = true;
             },
 
             formThreatModify(index) {
+                // Fill data
+                this.formThreat.name = this.tableThreat[index].threat;
+                this.formThreat.details = this.tableThreat[index].details;
+                this.formThreat.rank = String(map.indexOf(this.tableThreat[index].rank) + 1);
+                this.formThreat.tv = this.tableThreat[index].tv;
 
+                // Open the same dialog as ADD
+                this.threatDialogVisible = true;
             },
 
             formDelete(index, rows) {
