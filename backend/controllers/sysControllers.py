@@ -87,14 +87,27 @@ def sys_query_controller():
         return jsonify({'status': 1, 'error': HTTP_BADREQ_TEXT}), HTTP_BADREQ
 
     try:
-        system = User.query.filter(System.systemname == systemname).first()
-        # Check whether this systemname is existed
-        if system :
-            current_app.db.session.query(System.systemname, System.username, System.method, System.results,
+        res=current_app.db.session.query(System.systemname, System.username,System.method, System.results,
                                          System.description, System.createtime).filter(System.systemname == systemname and System.username == username).all()
-            return jsonify({'status': 0}), HTTP_OK
-        else:
+        res1 = current_app.db.session.query(Asset.assetname,Asset.systemname,Asset.val,Asset.description).filter(Asset.systemname == systemname).all()
+        res2 = current_app.db.session.query(Threat.threatname,Threat.systemname,Threat.val,Threat.description).filter(Threat.systemname == systemname).all()
+        res3= current_app.db.session.query(Vulnerability.vulname,Vulnerability.systemname,Vulnerability.val,Vulnerability.description).filter(Vulnerability.systemname == systemname).all()
+        if len(res) == 0:
             return jsonify({'status': 1, 'error': '该系统不存在'}), HTTP_OK
+        else:
+            assets=[]
+            for i in res1:
+                temp = {'assetname':i[0],'val':i[2],'description':i[3]}
+                assets.append(temp)
+            threats=[]
+            for i in res2:
+                temp = {'threatname':i[0],'val':i[2],'description':i[3]}
+                threats.append(temp)
+            vulnerabilities=[]
+            for i in res3:
+                temp = {'vulname':i[0],'val':i[2],'description':i[3]}
+                vulnerabilities.append(temp)
+        return jsonify({'status': 0, 'assets':assets,'threats':threats,'vulnerabilities':vulnerabilities}), HTTP_OK
 
     except:
         current_app.logger.error("Error in querying a new system:", exc_info=True)
@@ -110,7 +123,7 @@ def sys_fetch_all_controller():
     try:
         res = current_app.db.session.query(System.systemname, System.username, System.method, System.results,
                                      System.description, System.createtime).filter(System.username == username).all()
-        if res is None:
+        if len(res) == 0:
             return jsonify({'status': 1, 'error': '您还没有测试任何系统'}), HTTP_OK
         else:
             systems = []
