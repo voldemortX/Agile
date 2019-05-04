@@ -22,6 +22,7 @@ class TestModels(object):
     def teardown_class(self):
         # Deletes(cascade)
         self.app.db.session.query(User).filter(User.username == '__test__user').delete()
+        self.app.db.session.query(System).filter(System.username == '__test__user').delete()
         self.app.db.session.commit()
         # Close connections
         self.app.db.session.remove()
@@ -37,7 +38,7 @@ class TestModels(object):
         assert data['error'] == '您还没有测试任何系统'
 
     def test_valid(self):
-        #Valid
+        # Valid
         # Add a system(column 'createtime' is automated)
         new_system = System(systemname='__test__system', username='__test__user',
                             method='__test__method', results=json.dumps([{'attr': 'val'}]),
@@ -52,6 +53,8 @@ class TestModels(object):
         assert res.is_json is True
         data = res.get_json()
         assert data['status'] == 0
+
+
 
 
 
