@@ -90,10 +90,8 @@ def sys_query_controller():
         system = User.query.filter(System.systemname == systemname).first()
         # Check whether this systemname is existed
         if system :
-
             current_app.db.session.query(System.systemname, System.username, System.method, System.results,
-                                         System.description, System.createtime).filter(
-                System.systemname == systemname).all()
+                                         System.description, System.createtime).filter(System.systemname == systemname and System.username == username).all()
             return jsonify({'status': 0}), HTTP_OK
         else:
             return jsonify({'status': 1, 'error': '该系统不存在'}), HTTP_OK
@@ -128,4 +126,27 @@ def sys_fetch_all_controller():
 @error_guard('/sys/delete')
 @read_session
 def sys_delete_controller():
-    pass
+    username = session['username']
+    try:
+        temp_data = request.json
+        systemname = temp_data['systemname']
+    except:  # Parameter error
+        current_app.logger.error("Error in parsing requests:", exc_info=True)
+        return jsonify({'status': 1, 'error': HTTP_BADREQ_TEXT}), HTTP_BADREQ
+
+    try:
+        system = User.query.filter(System.systemname == systemname).first()
+        # Check whether this systemname is existed
+        if system :
+            current_app.db.session.query(System).filter(System.systemname == systemname and System.username == username).delete()
+            return jsonify({'status': 0}), HTTP_OK
+        else:
+            return jsonify({'status': 1, 'error': '系统不存在'}), HTTP_OK
+
+    except:
+        current_app.logger.error("Error in deleting a new system:", exc_info=True)
+        current_app.db.session.rollback()
+        return jsonify({'status': 1, 'error': '数据库未知错误'}), HTTP_UNKNOWN
+
+
+
