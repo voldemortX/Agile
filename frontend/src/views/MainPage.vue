@@ -14,7 +14,7 @@
         <span>已评估系统</span>
       </el-header>
       <el-main>
-        <el-table :data="tableData" border :header-cell-style="{background:'#FFFFFF'}":cell-style="{background:'#FFFFFF'}">
+        <el-table :data="tableData" border :header-cell-style="{background:'#FFFFFF'}" :cell-style="{background:'#FFFFFF'}">
           <el-table-column prop="systemname" label="SystemID" width="250">
           </el-table-column>
           <el-table-column prop="method" label="Method" width="140">
@@ -27,8 +27,8 @@
           </el-table-column>
           <el-table-column fixed="right" label="操作" width="180">
             <template slot-scope="scope">
-              <el-button @click="handleClick(scope.row)" type="text" size="small" style="font-size:16px;width:38px;height:20px">修改</el-button>
-              <el-button type="text" size="small" style="font-size:16px;width:38px;height:20px">删除</el-button>
+              <el-button @click.native="ModifyClick(scope.row)" type="text" size="small" style="font-size:16px;width:38px;height:20px">修改</el-button>
+              <el-button @click.native="DelClick(scope.$index,scope.row)" type="text" size="small" style="font-size:16px;width:38px;height:20px">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -42,14 +42,41 @@
 export default {
 name: 'mainPage',
 methods: {
-handleClick(row) {//进入该系统的编辑页
-    this.$http.get('/new?'+row.systemname)
-  .then((response)=>{
-      console.log(response)
-  })
-  .catch((error) => {
-      console.log(error);
-  })
+ModifyClick(row) {//进入该系统的编辑页
+    this.$http.get('http://134.175.225.180:3000/mock/43/sys/query',{
+        params:{sysname:row.sysname}
+    }).then(
+        (response) => {
+            if(response.ok && response.body.status == 0)
+            {
+                this.$router.push({name:'new',query:{sysname:row.systemname}})
+            }
+            else{
+                this.errorMessage = response.body.error;
+            }
+        },
+        (error) => {
+            this.errorMessage = response.body.error;
+        }
+    );
+},
+DelClick(index,row){//删除系统
+    this.$http.delete('http://134.175.225.180:3000/mock/43/sys/delete',{
+        params:{sysname:row.sysname}
+    }).then(
+        (response) => {
+            if(response.ok && response.body.status == 0)
+            {
+                    this.tableData.splice(index, 1);
+            }
+            else{
+                this.errorMessage = response.body.error;
+            }
+        },
+        (error) => {
+            this.errorMessage = response.body.error;
+        }
+    );
 },
 getnew(){//进入新建系统页
   /*this.$http.get('/new')
@@ -70,16 +97,34 @@ getnew(){//进入新建系统页
 },
 data(){
   return{
-    tableData: [{
+    tableData: [/*{
     systemname:'system1',
     method:'矩阵法',
     results:'5',
     createtime:'2019/04/25 10:20:00',
-    description:'blablablabla'}]
+    description:'blablablabla'}*/]
   }
-  }
+},
 
-};
+mounted:function()
+{//显示数据
+    this.$http.get('http://134.175.225.180:3000/mock/43/sys/fetch_all')
+    .then(
+        (response) => {
+            if(response.ok && response.body.status == 0)
+            {
+                this.tableData = response.body.systems;
+            }
+            else{
+                this.errorMessage = response.body.error;
+            }
+        },
+        (error) => {
+            this.errorMessage = response.body.error;
+        }
+    );
+}
+}
 </script>
 
 
@@ -107,3 +152,4 @@ data(){
   height:23px;
 }
 </style>
+
