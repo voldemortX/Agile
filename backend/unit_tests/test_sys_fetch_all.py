@@ -3,6 +3,7 @@ from server import app
 from params import HTTP_OK, HTTP_UNKNOWN, HTTP_BADREQ, HTTP_UNAUTH
 import json
 
+
 class TestModels(object):
     def setup_class(self):
         # Init
@@ -18,7 +19,6 @@ class TestModels(object):
             with c.session_transaction() as sess:
                 sess['username'] = '__test__user'
 
-
     def teardown_class(self):
         # Deletes(cascade)
         self.app.db.session.query(User).filter(User.username == '__test__user').delete()
@@ -27,8 +27,8 @@ class TestModels(object):
         self.app.db.session.remove()
         print('\n/sys/fetch_all ut complete!')
 
-
     def test_invalid(self):
+        # Invalid
         res = self.client.get('/sys/fetch_all')
         assert res.status_code == HTTP_OK
         assert res.is_json is True
