@@ -28,10 +28,30 @@ class TestModels(object):
         self.app.db.session.commit()
         res = self.app.db.session.query(System.results).filter(System.systemname == '__test__system').first()
         assert json.loads(res[0]) == [{'attr': 'val'}]
+        # Add a asset
+        new_asset = Asset(assetname='__test__asset', systemname='__test__system',val='10',  description='testa')
+        self.app.db.session.add(new_asset)
+        self.app.db.session.commit()
+        # Add a threat
+        new_threat = Threat(threatname='__test__threat', systemname='__test__system', val='20', description='testt')
+        self.app.db.session.add(new_threat)
+        self.app.db.session.commit()
+        # Add a vul
+        new_vul = Vulnerability(vulname='__test__vul', systemname='__test__system', val='30',description='testv')
+        self.app.db.session.add(new_vul)
+        self.app.db.session.commit()
 
     def teardown_class(self):
         # Deletes(cascade)
         self.app.db.session.query(User).filter(User.username == '__test__user').delete()
+        self.app.db.session.commit()
+        self.app.db.session.query(System).filter(System.username == '__test__user').delete()
+        self.app.db.session.commit()
+        self.app.db.session.query(Asset).filter(Asset.systemname == '__test__system').delete()
+        self.app.db.session.commit()
+        self.app.db.session.query(Threat).filter(Threat.systemname == '__test__system').delete()
+        self.app.db.session.commit()
+        self.app.db.session.query(Vulnerability).filter(Vulnerability.systemname == '__test__system').delete()
         self.app.db.session.commit()
         # Close connections
         self.app.db.session.remove()
