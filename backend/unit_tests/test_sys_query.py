@@ -23,8 +23,7 @@ class TestModels(object):
     def test_systems(self):
         # Add a system(column 'createtime' is automated)
         new_system = System(systemname='__test__system', username='__test__user',
-                            method='__test__method', results=json.dumps([{'attr': 'val'}]),
-                            description='test')
+                            method='__test__method', results=json.dumps([{'attr': 'val'}]),description='test')
         self.app.db.session.add(new_system)
         self.app.db.session.commit()
         res = self.app.db.session.query(System.results).filter(System.systemname == '__test__system').first()
