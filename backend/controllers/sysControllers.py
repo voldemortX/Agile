@@ -107,7 +107,7 @@ def sys_query_controller():
             for i in res3:
                 temp = {'vulname':i[0],'val':i[2],'description':i[3]}
                 vulnerabilities.append(temp)
-        return jsonify({'status': 0, 'assets':assets,'threats':threats,'vulnerabilities':vulnerabilities}), HTTP_OK
+        return jsonify({'status': 0, 'description':res[0][4],'method':res[0][2],'assets':assets,'threats':threats,'vulnerabilities':vulnerabilities,'results':res[0][3],'createtime':res[0][5]}), HTTP_OK
 
     except:
         current_app.logger.error("Error in querying a new system:", exc_info=True)
