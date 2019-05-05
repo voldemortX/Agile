@@ -187,11 +187,16 @@
         </el-dialog>
 
         <el-dialog title="评估结果" :visible.sync="resultDialogVisible" :modal-append-to-body="false">
+            <div slot="title" class="el-dialog__header">
+                <h2>评估结果</h2>
+                <el-button type="primary" @click.native="createWord">导出</el-button>
+                <el-button type="primary" >作图</el-button>
+            </div>
             <el-table :data="tva_results" border :header-cell-style="{background:'#FFFFFF'}" :cell-style="{background:'#FFFFFF'}">
-                <el-table-column prop="asset" label="资产名称" width="140"></el-table-column>
-                <el-table-column prop="threat" label="威胁名称" width="140"></el-table-column>
-                <el-table-column prop="vulnerability" label="脆弱性名称" width="140"></el-table-column>
-                <el-table-column prop="level" label="风险等级" width="140"></el-table-column>
+                <el-table-column prop="asset" label="资产名称" width="160"></el-table-column>
+                <el-table-column prop="threat" label="威胁名称" width="160"></el-table-column>
+                <el-table-column prop="vulnerability" label="脆弱性名称" width="160"></el-table-column>
+                <el-table-column prop="level" label="风险等级"></el-table-column>
             </el-table>
             <div slot="footer" class="dialog-footer">
                 <el-button @click.native="resultDialogVisible = false">取 消</el-button>
@@ -243,9 +248,9 @@
                 resultDialogVisible: false,
 
                 // Tab data
-                aim: '',
-                range: '',
-                team: '',
+                aim: '我想',
+                range: '跳楼',
+                team: '蛤？',
                 tableAsset: [
                     {asset: '测试资产5', confidentiality: '很高', integrity: '中', availability: '很低', rank: '很高', details: 'blabla'},
                     {asset: '测试资产4', confidentiality: '高', integrity: '中', availability: '很低', rank: '高', details: 'blabla'}
@@ -284,7 +289,7 @@
                 },
 
                 // System data
-                systemname: '',
+                systemname: 'test1',
                 method: 0,
                 tva_results: []
 
@@ -575,6 +580,73 @@
                 );
                 this.resultDialogVisible = false;
             },
+
+            // Create a table in .docx
+            createTable(doc, title, data, tableMap, tableMapCh, tableParaSize) {
+                const titleResults = new Paragraph(title).title();
+                const tableResults = new Table(data.length + 1, tableMap.length);
+                tableResults.setWidth(WidthType.PERCENTAGE, '100%');
+                // headers
+                for(let i = 0; i < tableMapCh.length; ++i)
+                    tableResults.getCell(0, i)
+                        .addContent(new Paragraph().center().addRun((new TextRun(tableMapCh[i]).size(tableParaSize))));
+                // data
+                for(let i = 0; i < data.length; ++i)
+                    for(let j = 0; j < tableMap.length; ++j)
+                    {
+                        const temp = new Paragraph();
+                        temp.addRun(new TextRun(data[i][tableMap[j]]).size(tableParaSize));
+                        const cell = tableResults.getCell(i + 1, j);
+                        cell.addContent(temp);
+                    }
+
+                doc.addParagraph(titleResults);
+                doc.addParagraph(tableResults);
+            },
+
+            createWord() {
+                // Definitions
+                const spacing = new Paragraph();
+                const methods = ['相乘法', '矩阵法'];
+                const tvaMap = ['asset', 'vulnerability', 'threat', 'level'];
+                const tvaMapCh = ['资产名称', '脆弱性名称', '威胁名称', '风险等级'];
+                const assetMap = ['asset', 'confidentiality', 'integrity', 'availability', 'rank', 'details'];
+                const assetMapCh = ['资产名称', '保密性', '完整性', '可用性', '最高安全等级', '描述'];
+                const vulMap = ['vulnerability', 'vaString', 'rank', 'details'];
+                const vulMapCh = ['脆弱性名称', '资产关联', '脆弱性等级', '描述'];
+                const threatMap = ['threat', 'tvString', 'rank', 'details'];
+                const threatMapCh = ['威胁名称', '脆弱性关联', '威胁等级', '描述'];
+                const tableParaSize = 28;
+                const paraSize = 32;
+
+                // Descriptions
+                const paragraphName = new Paragraph().addRun(new TextRun('系统名：' + this.systemname).size(paraSize));
+                const paragraphMethod = new Paragraph().addRun(new TextRun('方法：' + methods[this.method]).size(paraSize));
+                const paragraphAim = new Paragraph().addRun(new TextRun('目标：' + this.aim).size(paraSize));
+                const paragraphRange = new Paragraph().addRun(new TextRun('范围：' + this.range).size(paraSize));
+                const paragraphTeam = new Paragraph().addRun(new TextRun('团队：' + this.team).size(paraSize));
+
+                // Construct document
+                const doc = new Document();
+                doc.addParagraph(paragraphName);
+                doc.addParagraph(paragraphMethod);
+                doc.addParagraph(paragraphAim);
+                doc.addParagraph(paragraphRange);
+                doc.addParagraph(paragraphTeam);
+                doc.addParagraph(spacing);
+                this.createTable(doc, '资产情况：', this.tableAsset, assetMap, assetMapCh, tableParaSize);
+                this.createTable(doc, '脆弱性情况：', this.tableVul, vulMap, vulMapCh, tableParaSize);
+                this.createTable(doc, '威胁情况：', this.tableThreat, threatMap, threatMapCh, tableParaSize);
+                doc.addParagraph(spacing);
+                this.createTable(doc, '评估结果：', this.tva_results, tvaMap, tvaMapCh, tableParaSize);
+
+                // Export
+                const packer = new Packer();
+
+                packer.toBlob(doc).then(blob => {
+                    saveAs(blob, this.systemname + '评估报告.docx');
+                });
+            }
         }
     };
 </script>
