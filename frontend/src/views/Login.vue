@@ -14,7 +14,7 @@
                             <el-input name="password" prefix-icon="el-icon-arrow-right" size="medium" v-model="password" type="password" placeholder="密码"></el-input>
                         </el-form-item>
                         <el-form-item>
-                            <el-button name="login" type="success" round @click.native=login_click>登录</el-button>
+                            <el-button name="login" type="primary" round @click.native=login_click>登录</el-button>
                             <el-button name="register" round plain @click.native=register_click>注册</el-button>
                             <p class="error">{{errorMessage}}</p>
                         </el-form-item>
@@ -119,10 +119,10 @@
         margin: 20px;
     }
     .bg-dark {
-        background: #1976d2;
+        background: #000000;
     }
     .bg-light {
-        background: #2196F3;
+        background: #c0c1cc;
     }
     .grid-content {
         border-radius: 4px;

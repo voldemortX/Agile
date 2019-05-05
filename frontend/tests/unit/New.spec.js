@@ -2,12 +2,25 @@ import _new from '@/views/New.vue'
 import { expect } from 'chai'
 import { shallowMount } from '@vue/test-utils'
 import '../../src/plugins/element.js'
+import Vue from 'vue'
+import VueResource  from 'vue-resource'
+
+Vue.use(VueResource);
 
 
 describe('New.vue', () => {
     // Only test core algorithms
     it('Can do multiply', () => {
-        const wrapper = shallowMount(_new);
+        const $route = {
+            query: {
+                sysname: 'test'
+            }
+        };
+        const wrapper = shallowMount(_new,{
+            mocks: {
+                $route
+            }
+        });
         wrapper.setData({
             tableAsset: [
                 {asset: '测试资产5', confidentiality: '很高', integrity: '中', availability: '很低', rank: '很高', details: 'blabla'},
@@ -37,7 +50,16 @@ describe('New.vue', () => {
     });
 
     it('Can do matrix', () => {
-        const wrapper = shallowMount(_new);
+        const $route = {
+            query: {
+                sysname: 'test'
+            }
+        };
+        const wrapper = shallowMount(_new,{
+            mocks: {
+                $route
+            }
+        });
         wrapper.setData({
             tableAsset: [
                 {asset: '测试资产5', confidentiality: '很高', integrity: '中', availability: '很低', rank: '很高', details: 'blabla'},

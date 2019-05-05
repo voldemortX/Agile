@@ -190,7 +190,7 @@
             <div slot="title" class="el-dialog__header">
                 <h2>评估结果</h2>
                 <el-button type="primary" @click.native="createWord">导出</el-button>
-                <el-button type="primary" @click="createHist">作图</el-button>
+                <el-button type="primary" @click.native="createHist">作图</el-button>
             </div>
             <el-table :data="tva_results" border :header-cell-style="{background:'#FFFFFF'}" :cell-style="{background:'#FFFFFF'}">
                 <el-table-column prop="asset" label="资产名称" width="160"></el-table-column>
@@ -495,7 +495,7 @@
             formAssetModify(index) {
                 // Fill data
                 this.formAsset.name = this.tableAsset[index].asset;
-                this.formAsset.details = this.tableAsset[index].description;
+                this.formAsset.details = this.tableAsset[index].details;
                 this.formAsset.confidentiality = String(map.indexOf(this.tableAsset[index].confidentiality) + 1);
                 this.formAsset.integrity = String(map.indexOf(this.tableAsset[index].integrity) + 1);
                 this.formAsset.availability = String(map.indexOf(this.tableAsset[index].availability) + 1);
