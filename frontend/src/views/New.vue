@@ -190,7 +190,7 @@
             <div slot="title" class="el-dialog__header">
                 <h2>评估结果</h2>
                 <el-button type="primary" @click.native="createWord">导出</el-button>
-                <el-button type="primary" >作图</el-button>
+                <el-button type="primary" @click="createHist">作图</el-button>
             </div>
             <el-table :data="tva_results" border :header-cell-style="{background:'#FFFFFF'}" :cell-style="{background:'#FFFFFF'}">
                 <el-table-column prop="asset" label="资产名称" width="160"></el-table-column>
@@ -203,6 +203,11 @@
                 <el-button type="primary" @click.native="submitClick">确 定</el-button>
             </div>
         </el-dialog>
+
+        <el-dialog :visible.sync="chartDialogVisible" :modal-append-to-body="false" width="60%">
+            <div id="chart" style="width: 1200px;height:400px;"></div>
+        </el-dialog>
+
     </div>
 </template>
 
@@ -246,6 +251,7 @@
                 threatDialogVisible: false,
                 vulDialogVisible: false,
                 resultDialogVisible: false,
+                chartDialogVisible: false,
 
                 // Tab data
                 aim: '我想',
@@ -646,7 +652,78 @@
                 packer.toBlob(doc).then(blob => {
                     saveAs(blob, this.systemname + '评估报告.docx');
                 });
+            },
+
+            createHist()
+            {
+                this.chartDialogVisible = true;
+                this.$nextTick(function () {
+                    // Imports
+                    let echarts = require('echarts/lib/echarts');
+                    require('echarts/lib/chart/bar');
+                    require('echarts/lib/component/tooltip');
+                    require('echarts/lib/component/title');
+
+                    // Find DOM
+                    let myChart = echarts.init(document.getElementById('chart'));
+
+                    // Define histogram
+                    let histOptions = {
+                        title: {
+                            text: '重要资产的风险值等级柱状图'
+                        },
+                        tooltip: {},
+                        xAxis: {
+                            data: []
+                        },
+                        yAxis: {},
+                        axisLabel: {
+                            interval:0,
+                            rotate:40
+                        },
+                        series: [{
+                            type: 'bar',
+                            data: []
+                        }]
+                    };
+
+                    // Construct bars & Calculate indices
+                    let levels = [];
+                    let assets = [];
+                    let indices = [];
+                    let xAxis = [];
+                    let total = 0;
+                    for(let i of this.tableAsset)
+                    {
+                        assets.push(i.asset);
+                        let count = 0;
+                        for(let j of this.tva_results)
+                            if(j.asset === i.asset)
+                            {
+                                levels.push(j.level);
+                                xAxis.push('');
+                                ++count;
+                            }
+
+                        ++count;
+                        levels.push(0);
+                        xAxis.push('');
+                        indices.push(Math.floor(count / 2) + total - 1);
+                        total += count;
+                    }
+
+                    // Rearrange xAxis
+                    for(let i = 0; i < assets.length; ++i)
+                        xAxis[indices[i]] = assets[i];
+
+                    // Draw
+                    histOptions.xAxis.data = xAxis;
+                    histOptions.series[0].data = levels;
+                    myChart.setOption(histOptions);
+
+                });
             }
+
         }
     };
 </script>
