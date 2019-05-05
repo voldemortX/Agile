@@ -4,7 +4,7 @@
         <el-container width="200px">
             <el-header style="text-align: center; vertical-align:middle;font-size: 40px;height:100px">
                 <el-row></el-row>
-                <span>风险评估</span>
+                <span>{{systemname}}</span>
 
             </el-header>
             <el-main style="text-align: center; background-color:#000000">
@@ -239,6 +239,7 @@
     ];
 
     const map = ['很低', '低', '中', '高', '很高'];
+    const methods = ['相乘法', '矩阵法'];
 
     export default {
         name: '_new',
@@ -254,24 +255,12 @@
                 chartDialogVisible: false,
 
                 // Tab data
-                aim: '我想',
-                range: '跳楼',
-                team: '蛤？',
-                tableAsset: [
-                    {asset: '测试资产5', confidentiality: '很高', integrity: '中', availability: '很低', rank: '很高', details: 'blabla'},
-                    {asset: '测试资产4', confidentiality: '高', integrity: '中', availability: '很低', rank: '高', details: 'blabla'}
-                ],
-                tableVul: [
-                    {vulnerability: '测试脆弱性5', rank: '很高', vaString: '测试资产5,测试资产4', va: ['测试资产5', '测试资产4'], details: 'bla'},
-                    {vulnerability: '测试脆弱性3', rank: '中', vaString: '测试资产5', va: ['测试资产5'], details: 'bla'}
-                ],
-                tableThreat: [
-                    {threat: '测试威胁3', rank: '中', tvString: '测试脆弱性5,测试脆弱性3', tv: ['测试脆弱性5', '测试脆弱性3'], details: 'bla'},
-                    {threat: '测试威胁1', rank: '很低', tvString: '测试脆弱性5', tv: ['测试脆弱性5'], details: 'bla'}
-                ],
-                // tableAsset: [],
-                // tableVul: [],
-                // tableThreat: [],
+                aim: '',
+                range: '',
+                team: '',
+                tableAsset: [],
+                tableVul: [],
+                tableThreat: [],
 
                 // Form data
                 formAsset: {
@@ -302,7 +291,76 @@
             }
         },
 
+        created () {
+            this.systemname = this.$route.query.sysname;
+            this.$http({
+                method: 'GET',
+                url: 'http://134.175.225.180:3000/mock/43/sys/query',
+                // url: '/sys/query',
+                params: {
+                    systemname: this.systemname
+                }
+            }).then(
+                (response) => {
+                    // success
+                    if (response.ok && response.body.status === 0) {
+                        this.loadData(response.body);
+                    } else {
+                        this.messageBox('错误', response.body.error);
+                    }
+                },
+                (error) => {
+                    // error?
+                    this.messageBox('错误', error.body.error);
+                }
+            );
+        },
+
         methods: {
+            loadData(data) {
+                this.method = methods.indexOf(data.method);
+                this.tva_results = data.results.tva_results;
+
+                // Parse assets
+                for(let i of data.assets)
+                {
+                    let cia = i.description.split('&&&');
+                    let temp = {asset: i.assetname, confidentiality: cia[1], integrity: cia[2],
+                        availability: cia[3], details: cia[0], rank: map[i.val - 1]};
+                    this.tableAsset.push(temp);
+                }
+
+                // Parse vulnerabilities
+                for(let i of data.vulnerabilities)
+                {
+                    let va = data.results.va_results[i.vulname];
+                    let temp = {vulnerability: i.vulname, rank: map[i.val - 1],
+                        details: i.description, va: va, vaString: va.toString()};
+                    this.tableVul.push(temp);
+                }
+
+                // Parse threats
+                for(let i of data.threats)
+                {
+                    let tv = data.results.tv_results[i.threatname];
+                    let temp = {threat: i.threatname, rank: map[i.val - 1],
+                        details: i.description, tv: tv, tvString: tv.toString()};
+                    this.tableThreat.push(temp);
+                }
+
+                // Parse description
+                let str = data.description;
+                let temp = str.indexOf('&&&范围：');
+                this.aim = str.substr(3, temp - 3);
+                str = str.substr(temp + 6, str.length - temp - 6);
+                temp = str.indexOf('&&&成员：');
+                this.range = str.substr(0, temp);
+                str = str.substr(temp + 6, str.length - temp - 6);
+                temp = str.indexOf('&&&');
+                this.team = str.substr(0, temp);
+
+            },
+
             levelMultiply(val) {
                 // Can't have any malicious values at this point
                 return Math.ceil((val - 1) / 5);
@@ -613,7 +671,6 @@
             createWord() {
                 // Definitions
                 const spacing = new Paragraph();
-                const methods = ['相乘法', '矩阵法'];
                 const tvaMap = ['asset', 'vulnerability', 'threat', 'level'];
                 const tvaMapCh = ['资产名称', '脆弱性名称', '威胁名称', '风险等级'];
                 const assetMap = ['asset', 'confidentiality', 'integrity', 'availability', 'rank', 'details'];
