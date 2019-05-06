@@ -14,12 +14,15 @@
         <span>已评估系统</span>
       </el-header>
       <el-main>
-        <el-table :data="tableData" border :header-cell-style="{background:'#FFFFFF'}" :cell-style="{background:'#FFFFFF'}">
+        <el-table :data="tableSys" border :header-cell-style="{background:'#FFFFFF'}" :cell-style="{background:'#FFFFFF'}">
           <el-table-column prop="systemname" label="SystemID" width="250">
           </el-table-column>
           <el-table-column prop="method" label="Method" width="140">
           </el-table-column>
           <el-table-column prop="results" label="Result" width="100">
+          <template slot-scope="scope">
+              <el-button type="text" @click.native="result(scope.$index)" size="small" style="font-size:14px;width:38px;height:20px">查看详情</el-button>
+          </template>
           </el-table-column>
           <el-table-column prop="createtime" label="CreateTime" width="200">
           </el-table-column>
@@ -34,8 +37,15 @@
         </el-table>
       </el-main>
     </el-container>
-
-  </div>
+      <el-dialog title="评估结果" :visible.sync="resultDialogVisible" :modal-append-to-body="false">
+          <el-table :data="assessresults" border :header-cell-style="{background:'#FFFFFF'}" :cell-style="{background:'#FFFFFF'}">
+              <el-table-column prop="asset" label="资产名称" width="140"></el-table-column>
+              <el-table-column prop="threat" label="威胁名称" width="140"></el-table-column>
+              <el-table-column prop="vulnerability" label="脆弱性名称" width="140"></el-table-column>
+              <el-table-column prop="level" label="风险等级" width="140"></el-table-column>
+          </el-table>
+      </el-dialog>
+      </div>
 </template>
 
 <script>
@@ -67,7 +77,7 @@ DelClick(index,row){//删除系统
         (response) => {
             if(response.ok && response.body.status == 0)
             {
-                    this.tableData.splice(index, 1);
+                    this.tableSys.splice(index, 1);
             }
             else{
                 this.errorMessage = response.body.error;
@@ -77,6 +87,16 @@ DelClick(index,row){//删除系统
             this.errorMessage = response.body.error;
         }
     );
+},
+result(index){//弹出结果
+    this.assessresults.forEach((i)=>{
+        this.assessresults.splice(i,this.assessresults.length);
+    })
+    for(var i=0;i<tempresults[index].length;i++){
+        this.assessresults.push(tempresults[index][i]);
+    }
+
+    this.resultDialogVisible = true;
 },
 getnew(){//进入新建系统页
   /*this.$http.get('/new')
@@ -97,12 +117,20 @@ getnew(){//进入新建系统页
 },
 data(){
   return{
-    tableData: [/*{
+    tableSys: [/*{
     systemname:'system1',
     method:'矩阵法',
     results:'5',
     createtime:'2019/04/25 10:20:00',
-    description:'blablablabla'}*/]
+    description:'blablablabla'}*/],
+    resultDialogVisible: false,
+    assessresults:[/*{
+        asset:'a',
+        threat:'t',
+        vulnerability:'v',
+        level:'1'
+    }*/],
+    //tempresults:this.GLOBAL.tempresults
   }
 },
 
@@ -113,7 +141,21 @@ mounted:function()
         (response) => {
             if(response.ok && response.body.status == 0)
             {
-                this.tableData = response.body.systems;
+                //this.tableSys = response.body.systems;
+                for(var i = 0; i < response.body.systems.length;i++ )
+                {
+                    var temp = {};
+                    temp.systemname = response.body.systems[i].systemname;
+                    temp.method = response.body.systems[i].method;
+                    temp.createtime = response.body.systems[i].createtime;
+                    temp.description = response.body.systems[i].description;
+                    this.tableSys.push(temp);
+                    //console.log(response.body.systems[i].results);
+                }
+                for(var i = 0; i < response.body.systems.length;i++ )
+                {
+                    //tempresults[i]=response.body.systems[i].results;
+                }
             }
             else{
                 this.errorMessage = response.body.error;
@@ -152,4 +194,3 @@ mounted:function()
   height:23px;
 }
 </style>
-
