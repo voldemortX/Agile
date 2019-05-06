@@ -1,0 +1,9 @@
+versions:
+python 3.6+
+
+python requirements:
+flask
+flask-sqlalchemy
+pytest
+json
+concurrent_log_handler
