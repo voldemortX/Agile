@@ -153,9 +153,9 @@ def sys_delete_controller():
         return jsonify({'status': 1, 'error': HTTP_BADREQ_TEXT}), HTTP_BADREQ
 
     try:
-        system = User.query.filter(System.systemname == systemname).first()
+        system = current_app.db.session.query(System).filter(System.systemname == systemname).first()
         # Check whether this systemname is existed
-        if system :
+        if system:
             current_app.db.session.query(System).filter(System.systemname == systemname and System.username == username).delete()
             return jsonify({'status': 0}), HTTP_OK
         else:
