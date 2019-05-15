@@ -1,3 +1,5 @@
+import sys
+sys.path.append('../')
 from models import User
 from server import app
 from params import HTTP_OK, HTTP_UNKNOWN, HTTP_BADREQ, HTTP_UNAUTH
