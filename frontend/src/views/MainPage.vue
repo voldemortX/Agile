@@ -6,7 +6,7 @@
         <span>风险评估系统</span>
       </el-header>
       <el-main style="text-align: center; background-color:#000000">
-        <el-button type="primary" @click="getnew()">新建 +</el-button>
+        <el-button type="primary" @click="dialogFormVisible = true">新建 +</el-button>
       </el-main>
   </el-container>
     <el-container>
@@ -44,6 +44,18 @@
               <el-table-column prop="vulnerability" label="脆弱性名称" width="140"></el-table-column>
               <el-table-column prop="level" label="风险等级" width="140"></el-table-column>
           </el-table>
+      </el-dialog>
+
+      <el-dialog title="输入系统名称" :visible.sync="dialogFormVisible" :modal-append-to-body="false">
+          <el-form :model="newsys">
+              <el-form-item label="系统名称" :label-width="formLabelWidth">
+                  <el-input v-model="newsys.name" auto-complete="off"></el-input>
+              </el-form-item>
+          </el-form>
+          <div slot="footer" class="dialog-footer">
+            <el-button @click="dialogFormVisible = false" style="font-size:16px;width:75px;height:40px">取 消</el-button>
+            <el-button type="primary" @click.native="getnew()" style="font-size:16px;width:75px;height:40px">确 定</el-button>
+          </div>
       </el-dialog>
       </div>
 </template>
@@ -99,20 +111,8 @@ result(index){//弹出结果
     this.resultDialogVisible = true;
 },
 getnew(){//进入新建系统页
-  /*this.$http.get('/new')
-      .then((response) => {
-                        if (response.body.status === 0) {
-                            this.$router.push({path: '/new'});
-                        } else {
-                            alert(response.body.error);
-                        }
-                    },
-                    (error) => {
-                        // error
-                        this.dump();
-                        alert(error);
-                    });*/
-  this.$router.push({path: '/new'});
+  //dialogFormVisible = false,
+  this.$router.push({name:'new',query:{sysname:this.newsys.name}});
   }
 },
 data(){
@@ -124,6 +124,10 @@ data(){
     createtime:'2019/04/25 10:20:00',
     description:'blablablabla'}*/],
     resultDialogVisible: false,
+    dialogFormVisible : false,
+    newsys:{
+        name:''
+    },
     assessresults:[/*{
         asset:'a',
         threat:'t',
