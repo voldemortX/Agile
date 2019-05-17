@@ -3,7 +3,7 @@ import App from './App.vue'
 import './plugins/element.js'
 import router from './router'
 import VueResource from 'vue-resource'
-import './global.js'
+// import './global.js'
 
 Vue.use(VueResource);
 Vue.config.productionTip = false
