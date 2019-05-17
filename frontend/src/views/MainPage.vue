@@ -69,7 +69,7 @@
                     params:{sysname:row.sysname}
                 }).then(
                     (response) => {
-                        if(response.ok && response.body.status == 0)
+                        if(response.ok && response.body.status === 0)
                         {
                             this.$router.push({name:'new',query:{sysname:row.systemname}})
                         }
@@ -88,7 +88,7 @@
                     body: JSON.stringify({sysname:row.sysname})
                 }).then(
                     (response) => {
-                        if(response.ok && response.body.status == 0)
+                        if(response.ok && response.body.status === 0)
                         {
                             this.tableSys.splice(index, 1);
                         }
@@ -145,7 +145,7 @@
             this.$http.get('http://134.175.225.180:3000/mock/43/sys/fetch_all')
                 .then(
                     (response) => {
-                        if(response.ok && response.body.status == 0)
+                        if(response.ok && response.body.status === 0)
                         {
                             //this.tableSys = response.body.systems;
                             for(let i = 0; i < response.body.systems.length;i++ )
@@ -160,7 +160,7 @@
                             }
                             for(let i = 0; i < response.body.systems.length;i++ )
                             {
-                                this.tempresults.append(response.body.systems[i].results);
+                                this.tempresults.push(response.body.systems[i].results.tva_results);
                             }
                         }
                         else{
