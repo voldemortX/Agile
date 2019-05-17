@@ -65,25 +65,10 @@
         name: 'mainPage',
         methods: {
             ModifyClick(row) {//进入该系统的编辑页
-                this.$http.get('http://134.175.225.180:3000/mock/43/sys/query',{
-                    params:{sysname:row.sysname}
-                }).then(
-                    (response) => {
-                        if(response.ok && response.body.status === 0)
-                        {
-                            this.$router.push({name:'new',query:{sysname:row.systemname}})
-                        }
-                        else{
-                            this.errorMessage = response.body.error;
-                        }
-                    },
-                    (error) => {
-                        this.errorMessage = error.body.error;
-                    }
-                );
+                this.$router.push({name:'new',query:{sysname:row.systemname}})
             },
             DelClick(index,row){//删除系统
-                this.$http.delete('http://134.175.225.180:3000/mock/43/sys/delete',{
+                this.$http.delete(/*'http://134.175.225.180:3000/mock/43/sys/delete'*/ '/sys/delete',{
                     emulateJSON: true,
                     body: JSON.stringify({sysname:row.sysname})
                 }).then(
@@ -142,7 +127,7 @@
 
         mounted:function()
         {//显示数据
-            this.$http.get('http://134.175.225.180:3000/mock/43/sys/fetch_all')
+            this.$http.get(/*'http://134.175.225.180:3000/mock/43/sys/fetch_all'*/ '/sys/fetch_all')
                 .then(
                     (response) => {
                         if(response.ok && response.body.status === 0)
@@ -154,7 +139,7 @@
                                 temp.systemname = response.body.systems[i].systemname;
                                 temp.method = response.body.systems[i].method;
                                 temp.createtime = response.body.systems[i].createtime;
-                                temp.description = response.body.systems[i].description;
+                                temp.description = response.body.systems[i].description.replace('&&&', '; ').replace('&&&', '; ').replace('&&&', '');
                                 this.tableSys.push(temp);
                                 //console.log(response.body.systems[i].results);
                             }
