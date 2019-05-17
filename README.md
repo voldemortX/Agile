@@ -27,9 +27,9 @@ API集成化测试平台（包含MOCK请求）：[YApi](https://github.com/YMFE/
 
 部署方式：首先 [建立数据库](https://github.com/voldemortX/Agile/blob/v1.0/dbCreate.sql) ，并在params.py修改数据库URI，最后启动服务器方法根据实际情况（e.g. python server.py）, [具体环境细节](https://github.com/voldemortX/Agile/tree/v1.0/backend/configs.txt)
 
-前端开发测试等直接使用 [Vue-cli 3](https://cli.vuejs.org/zh/) 提供的集成开发测试可视化UI, *IDE玩家推荐使用WebStorm*
+前端开发测试等直接使用 [Vue-cli 3](https://cli.vuejs.org/zh/) 提供的集成开发测试可视化UI, *IDE玩家推荐使用 WebStorm*
 
-后端开发测试等按照 [说明](https://github.com/voldemortX/Agile/tree/v1.0/backend/configs.txt) 进行，*IDE玩家推荐使用Pycharm*
+后端开发测试等按照 [说明](https://github.com/voldemortX/Agile/tree/v1.0/backend/configs.txt) 进行，*IDE玩家推荐使用 Pycharm*
 
 # 在该环境开发容易遇到的几个大坑
 1. Vue-cli里面直接build得到的html和js,css等放在一起，部署时需要对应把html放到templates文件夹，其他放到static文件夹并 **对应将index.html里的引用路径加上/static**
@@ -38,7 +38,7 @@ API集成化测试平台（包含MOCK请求）：[YApi](https://github.com/YMFE/
 
 3. Vue-test-utils对第三方UI库的支持尚不完善，具体情况可以参考这个 [issue](https://github.com/vuejs/vue-test-utils/issues/1221)
 
-4. Pytorch常与pytest-cov不兼容，具体情况可以参考这个 [issue](https://github.com/pytest-dev/pytest-cov/issues/293) ，建议使用Conda创建新虚拟环境开发
+4. Pytorch常与Pytest-cov不兼容，具体情况可以参考这个 [issue](https://github.com/pytest-dev/pytest-cov/issues/293) ，建议使用Conda创建新虚拟环境开发
 
 5. Flask-SqlAlchemy这个库的实现存在缓存不一致问题，建议所有数据库操作采用SqlAlchemy的原始方法（假设有个表映射的类叫User）：e.g. 不要使用 ```User.query.all()``` , 改为使用 ```current_app.db.session.query(User).all()```
 
