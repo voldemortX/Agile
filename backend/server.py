@@ -11,7 +11,6 @@ app.config.from_mapping(appConfig)
 app.db = SQLAlchemy(app)
 app.register_blueprint(blueprint_auth)
 app.register_blueprint(blueprint_sys)
-print(app.template_folder)
 
 
 @app.route('/')
