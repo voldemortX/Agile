@@ -295,8 +295,8 @@
             this.systemname = this.$route.query.sysname;
             this.$http({
                 method: 'GET',
-                // url: 'http://134.175.225.180:3000/mock/43/sys/query',
-                url: '/sys/query',
+                url: 'http://134.175.225.180:3000/mock/43/sys/query',
+                // url: '/sys/query',
                 params: {
                     systemname: this.systemname
                 }
@@ -374,7 +374,7 @@
             },
 
             handleClick(tab, event) {
-                // console.log(tab, event);
+                console.log(tab, event);
             },
 
             dialogAssetClose() {
@@ -618,8 +618,8 @@
                 }
                 this.$http({
                     method: 'POST',
-                    //url: 'http://134.175.225.180:3000/mock/43/sys/submit',
-                    url: '/sys/submit',
+                    url: 'http://134.175.225.180:3000/mock/43/sys/submit',
+                    // url: '/sys/submit',
                     emulateJSON: true,
                     body: JSON.stringify({
                         systemname: this.systemname,
