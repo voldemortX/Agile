@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding:utf-8 -*-
 from models import *
 from server import app
 from params import HTTP_OK, HTTP_UNKNOWN, HTTP_BADREQ, HTTP_UNAUTH
@@ -59,7 +57,7 @@ class TestModels(object):
 
     def test_exist(self):
         # Invalid
-        res = self.client.get('/sys/query', json={'systemname': '__test__system2'})
+        res = self.client.get('/sys/query?systemname=__test__system2')
         assert res.status_code == HTTP_OK
         assert res.is_json is True
         data = res.get_json()
@@ -68,9 +66,13 @@ class TestModels(object):
 
         # Valid
         with self.client as c:
-            res = self.client.get('/sys/query', json={'systemname': '__test__system'})
+            res = self.client.get('/sys/query?systemname=__test__system')
             assert res.status_code == HTTP_OK
             assert res.is_json is True
             data = res.get_json()
             assert data['status'] == 0
 
+    # Test for bad requests
+    def test_400(self):
+        res = self.client.get('/sys/query')
+        assert res.status_code == HTTP_BADREQ

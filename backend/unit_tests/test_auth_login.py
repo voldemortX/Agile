@@ -1,3 +1,5 @@
+import sys
+sys.path.append('../')
 from models import User
 from server import app
 from params import HTTP_OK, HTTP_UNKNOWN, HTTP_BADREQ, HTTP_UNAUTH
@@ -23,6 +25,11 @@ class TestModels(object):
         # Close connections
         self.app.db.session.remove()
         print('\n/auth/login ut complete!')
+
+    # Test for bad requests
+    def test_400(self):
+        res = self.client.post('/auth/login', json={'username': 'test'})
+        assert res.status_code == HTTP_BADREQ
 
     def test_exist(self):
         # Invalid

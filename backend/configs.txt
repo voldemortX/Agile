@@ -1,9 +1,15 @@
 versions:
 python 3.6+
 
-python requirements:
+Python requirements:
+pymysql
 flask
 flask-sqlalchemy
 pytest
-json
+pytest-cov
 concurrent_log_handler
+
+Commands:
+Run server: python server.py
+Unit test(at unit_tests folder): pytest
+Coverage report(at unit_tests folder): pytest --cov=../ --cov-report=html

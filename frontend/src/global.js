@@ -1,0 +1,30 @@
+window.tempresults=[/*[{
+    asset:'a',
+    threat:'t',
+    vulnerability:'v',
+    level:'1'
+},
+{
+    asset:'a1',
+    threat:'t1',
+    vulnerability:'v1',
+    level:'5'
+}],
+[{
+    asset:'a2',
+    threat:'t2',
+    vulnerability:'v',
+    level:'1'
+},
+{
+    asset:'a3',
+    threat:'t3',
+    vulnerability:'v1',
+    level:'5'
+},
+  {
+      asset:'a4',
+      threat:'t3',
+      vulnerability:'v1',
+      level:'5'
+  }]*/];

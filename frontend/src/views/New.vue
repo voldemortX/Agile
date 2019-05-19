@@ -177,7 +177,7 @@
                     </el-checkbox-group>
                 </el-form-item>
                 <el-form-item>
-                    <el-input type="textarea" :rows="5" placeholder="请输入脆弱性描述" v-model="formVul.details"></el-input>
+                    <el-input type="textarea" :rows="5" placeholder="请输入脆弱性描述" v-model="formThreat.details"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -306,7 +306,8 @@
                     if (response.ok && response.body.status === 0) {
                         this.loadData(response.body);
                     } else {
-                        this.messageBox('错误', response.body.error);
+                        if(response.body.error !== '该系统不存在')
+                            this.messageBox('错误', response.body.error);
                     }
                 },
                 (error) => {
@@ -425,6 +426,7 @@
                         confidentiality: map[this.formAsset.confidentiality - 1],
                         integrity: map[this.formAsset.integrity - 1],
                         availability: map[this.formAsset.availability - 1],
+                        details: this.formAsset.details,
                         rank: map[val - 1]
                     };
 
