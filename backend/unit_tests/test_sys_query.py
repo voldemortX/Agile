@@ -72,3 +72,7 @@ class TestModels(object):
             data = res.get_json()
             assert data['status'] == 0
 
+    # Test for bad requests
+    def test_400(self):
+        res = self.client.get('/sys/query')
+        assert res.status_code == HTTP_BADREQ

@@ -16,9 +16,6 @@ class TestModels(object):
         new_user = User(username='__test__user', password='xxx')
         self.app.db.session.add(new_user)
         self.app.db.session.commit()
-        with self.client as c:
-            with c.session_transaction() as sess:
-                sess['username'] = '__test__user'
 
     def teardown_class(self):
         # Deletes(cascade)
@@ -37,6 +34,19 @@ class TestModels(object):
         self.app.db.session.commit()
         res = self.app.db.session.query(System.results).filter(System.systemname == '__test__system').first()
         assert json.loads(res[0]) == [{'attr': 'val'}]
+
+    # Test for wrong cookies
+    def test_401(self):
+        res = self.client.delete('/sys/delete', json={'systemname': '__test__system2'})
+        assert res.status_code == HTTP_UNAUTH
+
+    # Test for bad requests
+    def test_400(self):
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess['username'] = '__test__user'
+        res = self.client.delete('/sys/delete', json={'username': 'test'})
+        assert res.status_code == HTTP_BADREQ
 
     def test_exist(self):
         # Invalid

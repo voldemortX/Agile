@@ -26,6 +26,11 @@ class TestModels(object):
         self.app.db.session.remove()
         print('\n/auth/login ut complete!')
 
+    # Test for bad requests
+    def test_400(self):
+        res = self.client.post('/auth/login', json={'username': 'test'})
+        assert res.status_code == HTTP_BADREQ
+
     def test_exist(self):
         # Invalid
         res = self.client.post('/auth/login', json={'username': '__test__user', 'password': '654321'})
