@@ -24,7 +24,7 @@ class Asset(db.Model):
 class System(db.Model):
     __tablename__ = 'systems'
 
-    systemname = db.Column(db.String(50), primary_key=True, nullable=False, unique=True)
+    systemname = db.Column(db.String(50), primary_key=True, nullable=False)
     username = db.Column(db.ForeignKey('users.username', ondelete='CASCADE'), primary_key=True, nullable=False, index=True)
     method = db.Column(db.String(20), nullable=False)
     results = db.Column(db.Text, nullable=False)

@@ -30,7 +30,7 @@ def sys_submit_controller():
     # If exists: update
     # Else: insert
     try:
-        res = current_app.db.session.query(System).filter(System.systemname == systemname).first()
+        res = current_app.db.session.query(System).filter(System.systemname == systemname, System.username == username).first()
         if res is None:  # Insert
             new_system = System(systemname=systemname, username=username, description=description, method=method, results=json.dumps(results))
             current_app.db.session.add(new_system)
@@ -87,7 +87,7 @@ def sys_query_controller():
 
     try:
         res=current_app.db.session.query(System.systemname, System.username,System.method, System.results,
-                                         System.description, System.createtime).filter(System.systemname == systemname and System.username == username).all()
+                                         System.description, System.createtime).filter(System.systemname == systemname, System.username == username).all()
         res1 = current_app.db.session.query(Asset.assetname,Asset.systemname,Asset.val,Asset.description).filter(Asset.systemname == systemname).all()
         res2 = current_app.db.session.query(Threat.threatname,Threat.systemname,Threat.val,Threat.description).filter(Threat.systemname == systemname).all()
         res3 = current_app.db.session.query(Vulnerability.vulname,Vulnerability.systemname,Vulnerability.val,Vulnerability.description).filter(Vulnerability.systemname == systemname).all()
@@ -157,7 +157,7 @@ def sys_delete_controller():
         system = current_app.db.session.query(System).filter(System.systemname == systemname).first()
         # Check whether this systemname is existed
         if system:
-            current_app.db.session.query(System).filter(System.systemname == systemname and System.username == username).delete()
+            current_app.db.session.query(System).filter(System.systemname == systemname, System.username == username).delete()
             return jsonify({'status': 0}), HTTP_OK
         else:
             return jsonify({'status': 1, 'error': '系统不存在'}), HTTP_OK

@@ -17,7 +17,7 @@ CREATE TABLE `users`
 
 CREATE TABLE `systems`
 (
-	`systemname` varchar(50) NOT NULL UNIQUE,
+	`systemname` varchar(50) NOT NULL,
     `username` varchar(20) NOT NULL,
     `method` varchar(20) NOT NULL,
     `results` text NOT NULL,
