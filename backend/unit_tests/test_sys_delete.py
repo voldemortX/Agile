@@ -37,7 +37,7 @@ class TestModels(object):
 
     # Test for wrong cookies
     def test_401(self):
-        res = self.client.delete('/sys/delete', json={'systemname': '__test__system2'})
+        res = self.client.delete('/sys/delete?systemname=__test__system2')
         assert res.status_code == HTTP_UNAUTH
 
     # Test for bad requests
@@ -45,12 +45,12 @@ class TestModels(object):
         with self.client as c:
             with c.session_transaction() as sess:
                 sess['username'] = '__test__user'
-        res = self.client.delete('/sys/delete', json={'username': 'test'})
+        res = self.client.delete('/sys/delete?username=__test__user')
         assert res.status_code == HTTP_BADREQ
 
     def test_exist(self):
         # Invalid
-        res = self.client.delete('/sys/delete', json={'systemname': '__test__system2'})
+        res = self.client.delete('/sys/delete?systemname=__test__system2')
         assert res.status_code == HTTP_OK
         assert res.is_json is True
         data = res.get_json()
@@ -59,7 +59,7 @@ class TestModels(object):
 
         # Valid
         with self.client as c:
-            res = self.client.delete('/sys/delete', json={'systemname': '__test__system'})
+            res = self.client.delete('/sys/delete?systemname=__test__system')
             assert res.status_code == HTTP_OK
             assert res.is_json is True
             data = res.get_json()

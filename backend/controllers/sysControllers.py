@@ -112,7 +112,6 @@ def sys_query_controller():
 
     except:
         current_app.logger.error("Error in querying a new system:", exc_info=True)
-        current_app.db.session.rollback()
         return jsonify({'status': 1, 'error': '数据库未知错误'}), HTTP_UNKNOWN
 
 
@@ -137,7 +136,6 @@ def sys_fetch_all_controller():
 
     except:
         current_app.logger.error("Error in fetching systems:", exc_info=True)
-        current_app.db.session.rollback()
         return jsonify({'status': 1, 'error': '数据库未知错误'}), HTTP_UNKNOWN
 
 
@@ -146,10 +144,9 @@ def sys_fetch_all_controller():
 @read_session
 def sys_delete_controller():
     username = session['username']
-    try:
-        temp_data = request.json
-        systemname = temp_data['systemname']
-    except:  # Parameter error
+    systemname = request.args.get('systemname')
+    if systemname is None:
+        # Parameter error
         current_app.logger.error("Error in parsing requests:", exc_info=True)
         return jsonify({'status': 1, 'error': HTTP_BADREQ_TEXT}), HTTP_BADREQ
 
@@ -158,6 +155,7 @@ def sys_delete_controller():
         # Check whether this systemname is existed
         if system:
             current_app.db.session.query(System).filter(System.systemname == systemname, System.username == username).delete()
+            current_app.db.session.commit()
             return jsonify({'status': 0}), HTTP_OK
         else:
             return jsonify({'status': 1, 'error': '系统不存在'}), HTTP_OK
